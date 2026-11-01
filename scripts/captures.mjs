@@ -37,7 +37,7 @@ for (const [nom, vp] of [
       .catch(() => console.error("  images encore en chargement :", r));
     await page.waitForTimeout(600);
     const f = path.join(dossier, `${r.replace(/\//g, "_") || "_accueil"}-${nom}.png`);
-    await page.screenshot({ path: f, fullPage: true });
+    await page.screenshot({ path: f, fullPage: true, timeout: 300_000 });
     console.log(f);
   }
   await ctx.close();

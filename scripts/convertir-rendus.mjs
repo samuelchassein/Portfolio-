@@ -15,8 +15,11 @@ for (const dossier of ["public/renders", "public/renders/scenes"]) {
     const src = path.join(dossier, f);
     const dst = src.replace(/\.png$/, ".webp");
     if (fs.existsSync(dst) && fs.statSync(dst).mtimeMs > fs.statSync(src).mtimeMs) continue;
-    await sharp(src).webp({ quality: 88, alphaQuality: 100, effort: 5 }).toFile(dst);
-    console.log("webp", dst);
+    // Blender écrit en PNG 16 bits (≈ 12 Mo) : on repasse en 8 bits compressé.
+    const brut = await sharp(src).toBuffer();
+    await sharp(brut).toColourspace("srgb").png({ compressionLevel: 9, palette: false }).toFile(src);
+    await sharp(brut).webp({ quality: 88, alphaQuality: 100, effort: 5 }).toFile(dst);
+    console.log("webp", dst, (fs.statSync(src).size / 1e6).toFixed(1), "Mo (png)");
   }
 }
 

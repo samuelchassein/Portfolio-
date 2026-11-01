@@ -88,7 +88,13 @@ export interface FlaconProps {
    */
   qualite?: QualiteFlacon;
   /** Couleur vue à travers le verre quand rien n'est derrière (ambiance). */
-  fondRefraction?: string;
+  fondRefraction?: string | THREE.Color;
+  /**
+   * Couleur de jus pilotée image par image (scène des familles) : si fournie,
+   * elle est recopiée à chaque image dans le matériau du jus, pour un glissement
+   * continu sans re-rendu React.
+   */
+  jusDynamique?: THREE.Color;
   /** Résolution du tampon de réfraction (défaut : 1 024, 512 sur mobile). */
   resolutionRefraction?: number;
   onPret?: () => void;
@@ -107,6 +113,7 @@ export const Flacon = forwardRef<THREE.Group, FlaconProps>(function Flacon(
     qualite = "haute",
     fondRefraction = "#e9dcc4",
     resolutionRefraction,
+    jusDynamique,
     onPret,
   },
   ref,
@@ -156,6 +163,19 @@ export const Flacon = forwardRef<THREE.Group, FlaconProps>(function Flacon(
   const jusClair = useMemo(() => new THREE.Color(couleurJus).lerp(new THREE.Color("#FFF2C8"), 0.62), [couleurJus]);
 
   const export_ = qualite === "export";
+  const fondCouleur = useMemo(
+    () => (typeof fondRefraction === "string" ? new THREE.Color(fondRefraction) : fondRefraction),
+    [fondRefraction],
+  );
+  const refMatJus = useRef<THREE.MeshPhysicalMaterial>(null);
+  const blanc = useMemo(() => new THREE.Color("#FFF2C8"), []);
+  useFrame(() => {
+    const m = refMatJus.current;
+    if (!jusDynamique || !m) return;
+    m.attenuationColor.copy(jusDynamique);
+    m.emissive.copy(jusDynamique);
+    m.color.copy(jusDynamique).lerp(blanc, 0.62);
+  });
   // L'étiquette est posée sur le verre : elle ne doit pas apparaître dans le
   // tampon de réfraction (sinon elle se dédouble à travers la face avant).
   // Priorité -1 : avant le rendu du tampon par MeshTransmissionMaterial ;
@@ -197,7 +217,7 @@ export const Flacon = forwardRef<THREE.Group, FlaconProps>(function Flacon(
         ) : (
           <MeshTransmissionMaterial
             name="verre"
-            background={new THREE.Color(fondRefraction)}
+            background={fondCouleur}
             transmission={1}
             thickness={0.55}
             ior={1.5}
@@ -234,6 +254,7 @@ export const Flacon = forwardRef<THREE.Group, FlaconProps>(function Flacon(
           />
         ) : qualite === "haute" ? (
           <meshPhysicalMaterial
+            ref={refMatJus}
             name="jus"
             color={jusClair}
             transmission={1}

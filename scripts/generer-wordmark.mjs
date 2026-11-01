@@ -31,13 +31,16 @@ function versD(chemin) {
 function mot(font, texte, taille, espacement, x0, yBase) {
   let x = x0;
   const chemins = [];
+  const lettres = [];
   for (const c of texte) {
     const g = font.charToGlyph(c);
-    chemins.push(versD(g.getPath(x, yBase, taille)));
+    const d = versD(g.getPath(x, yBase, taille));
+    chemins.push(d);
+    lettres.push({ d, x: Number((x + font.getAdvanceWidth(c, taille) / 2).toFixed(2)) });
     x += font.getAdvanceWidth(c, taille) + espacement * taille;
   }
   const largeur = x - x0 - espacement * taille;
-  return { d: chemins.join(""), largeur };
+  return { d: chemins.join(""), largeur, lettres };
 }
 
 // Proportions relevées sur logo-maison-sensa.jpg : MAISON ≈ 71 % de la largeur
@@ -67,6 +70,9 @@ export const WORDMARK = {
   hauteur: ${ySensa.toFixed(2)},
   maison: ${JSON.stringify(maison.d)},
   sensa: ${JSON.stringify(sensa.d)},
+  /** Lettres séparées (animation de chargement) : tracé et centre horizontal. */
+  lettresMaison: ${JSON.stringify(maison.lettres)},
+  lettresSensa: ${JSON.stringify(sensa.lettres)},
 } as const;
 
 /** Monogramme « S » (favicon, petits formats). */

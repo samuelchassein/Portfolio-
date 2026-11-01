@@ -12,7 +12,7 @@ function textureTravertin(taille = 1024) {
   const c = document.createElement("canvas");
   c.width = c.height = taille;
   const g = c.getContext("2d")!;
-  g.fillStyle = "#E6D8C0";
+  g.fillStyle = "#EDE3D1";
   g.fillRect(0, 0, taille, taille);
   let seed = 11;
   const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
