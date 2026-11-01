@@ -1,20 +1,118 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------
+   Maison Sensa — design system
+   Palette échantillonnée sur le moodboard ; une seule source de vérité.
+   ------------------------------------------------------------------ */
 :root {
-  --ivoire: #F6EDDD;
-  --ivoire-clair: #FBF6EE;
-  --travertin: #E8DCC8;
-  --vert-profond: #1F3A2E;
+  --ivoire: #f6eddd;
+  --ivoire-clair: #fbf6ee;
+  --travertin: #e8dcc8;
+  --vert-profond: #1f3a2e;
   --vert-nuit: #142820;
-  --dore: #C9A26A;
-  --dore-clair: #D4AC70;
-  --noyer: #64371B;
-  --encre: #1C1A17;
-  --encre-douce: #5B544A;
+  --dore: #c9a26a;
+  --dore-clair: #d4ac70;
+  /* Doré foncé : seule teinte dorée lisible en petit texte (5,3:1 sur ivoire, 4,5:1 sur travertin). */
+  --dore-texte: #7a5d2c;
+  --noyer: #64371b;
+  --encre: #1c1a17;
+  --encre-douce: #5b544a;
+  --erreur: #9b2c1f;
+
+  --ease-doux: cubic-bezier(0.22, 1, 0.36, 1); /* expo.out */
+  --ease-sortie: cubic-bezier(0.33, 1, 0.68, 1); /* power2.out */
+}
+
+@theme inline {
+  --color-ivoire: var(--ivoire);
+  --color-ivoire-clair: var(--ivoire-clair);
+  --color-travertin: var(--travertin);
+  --color-vert: var(--vert-profond);
+  --color-vert-nuit: var(--vert-nuit);
+  --color-dore: var(--dore);
+  --color-dore-clair: var(--dore-clair);
+  --color-dore-texte: var(--dore-texte);
+  --color-noyer: var(--noyer);
+  --color-encre: var(--encre);
+  --color-encre-douce: var(--encre-douce);
+  --color-erreur: var(--erreur);
+
+  --font-serif: var(--police-serif), "Cormorant Garamond", Garamond, serif;
+  --font-sans: var(--police-sans), Jost, "Helvetica Neue", Arial, sans-serif;
+
+  --ease-doux: var(--ease-doux);
+  --ease-sortie: var(--ease-sortie);
+
+  /* Échelle typographique : titres héros 64–120 px sur desktop. */
+  --text-hero: clamp(3rem, 1.6rem + 6vw, 7.5rem);
+  --text-hero--line-height: 0.98;
+  --text-titre: clamp(2.25rem, 1.5rem + 3vw, 4.5rem);
+  --text-titre--line-height: 1.04;
+  --text-sous-titre: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+  --text-sous-titre--line-height: 1.2;
+  --text-surtitre: 0.75rem;
+  --text-surtitre--line-height: 1.4;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--ivoire);
+  /* Grain papier très léger sur toute la page. */
+  background: var(--ivoire) url("/textures/grain.png") repeat;
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
   color: var(--encre);
-  font-family: var(--font-sans), sans-serif;
+  font-family: var(--police-sans), Jost, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+
+/* Grain papier très léger sur les grands aplats ivoire. */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("/textures/grain.png");
+  background-size: 256px 256px;
+  mix-blend-mode: multiply;
+}
+
+/* Chiffres alignés dans le serif (prix « 149 € », compteurs « 01 / 04 »). */
+.font-serif {
+  font-variant-numeric: lining-nums;
+}
+
+/* Focus visible : anneau doré doublé d'un contour encre pour garder le contraste. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--dore);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--encre) 35%, transparent);
+  border-radius: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--dore) 45%, transparent);
+  color: var(--encre);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -31,7 +31,7 @@ async function ouvrir(query, l, h) {
   });
   const page = await navigateur.newPage({ viewport: { width: l, height: h }, deviceScaleFactor: 1 });
   page.on("pageerror", (e) => console.error("[page]", e.message));
-  await page.goto(`${BASE}/dev/flacon?${query}`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/dev/flacon?${query}`, { waitUntil: "load", timeout: 300_000 });
   await page.waitForFunction(() => window.__flaconPret === true, null, { timeout: 600_000 });
   return { navigateur, page };
 }

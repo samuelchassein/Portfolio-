@@ -4,5 +4,3 @@
 Contrôlés à 100 % : visages, mains et lettrages restent naturels.
 
 Ce sont les sources des images du site ; les tailles AVIF/WebP servies sont générées à partir d'elles, jamais au-delà de leur largeur.
-
-À noter : `parcours-1-je-cree` porte une bande sombre sur son bord droit (héritée du recadrage de l'affiche), à recadrer.

@@ -2,7 +2,7 @@ import localFont from "next/font/local";
 
 /** Serif des titres et du wordmark (proche du « SENSA » du logo). */
 export const serif = localFont({
-  variable: "--font-serif",
+  variable: "--police-serif",
   display: "swap",
   src: [
     { path: "../public/fonts/cormorant-garamond-latin-500-normal.woff2", weight: "500", style: "normal" },
@@ -15,7 +15,7 @@ export const serif = localFont({
 
 /** Sans-serif géométrique : petites capitales espacées et texte courant. */
 export const sans = localFont({
-  variable: "--font-sans",
+  variable: "--police-sans",
   display: "swap",
   src: [
     { path: "../public/fonts/jost-latin-300-normal.woff2", weight: "300", style: "normal" },
