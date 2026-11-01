@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+:root {
+  --ivoire: #F6EDDD;
+  --ivoire-clair: #FBF6EE;
+  --travertin: #E8DCC8;
+  --vert-profond: #1F3A2E;
+  --vert-nuit: #142820;
+  --dore: #C9A26A;
+  --dore-clair: #D4AC70;
+  --noyer: #64371B;
+  --encre: #1C1A17;
+  --encre-douce: #5B544A;
+}
+
+body {
+  background: var(--ivoire);
+  color: var(--encre);
+  font-family: var(--font-sans), sans-serif;
+}
