@@ -21,7 +21,7 @@ Brief : `kit/PROMPT_CLAUDE_CODE.md` · Plan et décisions : `PLAN.md` · Branche
 3. ~~Boutique, fiches (visualiseur 360°), panier, commande simulée~~ fait (tests : recharge bloquée, atelier + bougie 45 €, commande).
 4. ~~`/carte-cadeau`~~ fait.
 5. ~~`/maison`, `/contact`, pages légales, bandeau cookies, SEO~~ fait.
-6. `/visite` : page prête ; s’active seule dès que `public/visite-360/maquette-360.html` est déposé (fichier toujours manquant).
+6. ~~/visite~~ fait : la maquette 360° fournie est reconstruite dans le site (`components/visite/`, contenus dans `content/visite.ts`), aux couleurs de la marque, 5 espaces clients, visite guidée, clavier, repli en images sans WebGL. Lighthouse : accessibilité, bonnes pratiques, SEO à 100.
 7. ~~Vérification groupée, build de production, Lighthouse~~ fait (build de prod : accessibilité, bonnes pratiques, SEO à 100 ; perf mobile 54 accueil (3D), 89 atelier, 81 fiche produit ; bureau 69 / 100 / 99).
 8. Tests e-mails réels après collage des gabarits dans EmailJS par la personne.
 

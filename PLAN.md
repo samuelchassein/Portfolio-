@@ -86,7 +86,7 @@ emails/                     template-client.html, template-boutique.html (+ vers
 public/models/              flacon-maison-sensa.glb
 public/renders/             rendus HD transparents (PNG + WebP, ≥ 2 400 px de haut)
 public/images/              visuels traités (recadrés, agrandis, AVIF/WebP)
-public/visite-360/          maquette-360.html
+components/visite/           visite 360° (maquette 3D reconstruite d’après la maquette HTML fournie)
 scripts/                    traitement d'images, rendu des vues 3D, calibration, captures Playwright
 docs/calibration/           comparaisons flacon / photo
 ```

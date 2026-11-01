@@ -30,6 +30,7 @@ Les identifiants EmailJS sont lus dans `.env.local` (jamais versionné, voir `.e
 | `content/familles.ts` | Les 4 familles : notes, évocations, couleurs d'ambiance et de jus |
 | `content/diagnostic.ts` | Questions et senteurs du diagnostic, textes de résultat |
 | `content/faq.ts`, `content/atelier.ts` | FAQ et déroulé de l'atelier |
+| `content/visite.ts` | Visite 360° : les 5 espaces de la boutique (textes, photos, prix, liens) |
 
 ## À compléter avant mise en ligne
 
@@ -41,7 +42,6 @@ Toutes ces valeurs sont des **exemples** à remplacer :
 - [ ] `content/produits.ts` → `PRIX.coffret`
 - [ ] Pages légales (`app/(site)/(legal)/`) : tous les passages **[À COMPLÉTER]** (rétractation, cartes cadeaux, médiateur, durées de conservation, prestataire de paiement)
 - [ ] Le plan stylisé de la page d'accueil (`components/scenes/VisiteCarteInfos.tsx`, `PlanStylise`) est indicatif : à aligner sur l'adresse réelle
-- [ ] `public/visite-360/maquette-360.html` : déposer le fichier de la visite 360° (la page `/visite` l'intègre automatiquement)
 - [ ] EmailJS : coller les gabarits et autoriser le domaine (section suivante)
 
 ## E-mails avec EmailJS (à faire une fois)
@@ -79,6 +79,7 @@ app/(site)/          pages publiques (accueil, atelier, diagnostic, boutique, pa
 app/styleguide       design system (non indexé)
 app/dev/flacon       studio 3D interne (calibration, rendus, export GLB ; non indexé)
 components/scenes    scènes de la page d'accueil
+components/visite    visite 360° : maquette 3D de la boutique (React Three Fiber)
 components/three     flacon, bougie, format voyage, coffret (React Three Fiber), visualiseur 360°
 components/brand     wordmark vectoriel, filets, cadres, arches, pictogrammes
 components/ui        boutons, champs de formulaire
