@@ -11,3 +11,4 @@ __pycache__/
 tmp-360/
 .next-prod/
 .netlify
+deploy-*.zip
