@@ -8,15 +8,10 @@ import { Picto } from "@/components/brand/Pictos";
 import { CadreDore, Surtitre } from "@/components/brand/Signes";
 import { LienBouton } from "@/components/ui/Bouton";
 import { SITE } from "@/content/site";
+import { ETAPES_ATELIER } from "@/content/atelier";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export const ETAPES_ATELIER = [
-  { titre: "Accueil", texte: "Nous découvrons vos attentes, pour vous ou pour offrir." },
-  { titre: "Exploration", texte: "Vous découvrez les familles olfactives et leurs accords." },
-  { titre: "Sélection", texte: "Guidé par votre conseiller, vous composez votre parfum." },
-  { titre: "Votre signature", texte: "Récapitulatif de votre choix, flacon 50 ml, référence conservée pour vos recharges." },
-];
 
 /**
  * Scène 4 : l'Atelier Signature. Mise en page asymétrique, quatre étapes
