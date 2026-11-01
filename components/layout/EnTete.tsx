@@ -36,7 +36,7 @@ export function EnTete() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-500 ease-sortie ${
-        defile ? "bg-ivoire/88 shadow-[0_1px_0_rgb(28_26_23/0.08)] backdrop-blur-md" : "bg-transparent"
+        defile ? "bg-ivoire/88 shadow-[0_1px_0_rgb(28_26_23/0.08)] backdrop-blur-md" : "bg-ivoire/88 backdrop-blur-md md:bg-transparent md:backdrop-blur-none"
       }`}
     >
       <a

@@ -20,6 +20,9 @@ type Infos = { prenom: string; nom: string; email: string; telephone: string; po
 
 /** Réservation de l'Atelier Signature en trois étapes (parcours simulé, e-mails réels). */
 export function Reservation() {
+  // Le calendrier dépend de la date du jour : rendu uniquement dans le navigateur.
+  const [monte, setMonte] = useState(false);
+  useEffect(() => setMonte(true), []);
   const [etape, setEtape] = useState(0);
   const [creneau, setCreneau] = useState<string | null>(null);
   const [resa, setResa] = useState<Resa | null>(null);
@@ -31,6 +34,8 @@ export function Reservation() {
   useEffect(() => {
     if (etape > 0) titre.current?.focus();
   }, [etape]);
+
+  if (!monte) return <div className="min-h-[34rem]" aria-busy="true" />;
 
   return (
     <div>

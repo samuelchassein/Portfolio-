@@ -18,7 +18,7 @@ export default function PageVisite() {
   return (
     <section className="relative min-h-svh">
       <Image src="/images/interieur-vue-large.jpg" alt="L’intérieur de la boutique Maison Sensa." fill priority sizes="100vw" quality={85} className="object-cover" />
-      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ivoire via-ivoire/50 to-ivoire/10" />
+      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ivoire from-25% via-ivoire/80 to-ivoire/10" />
       <div className="relative mx-auto flex min-h-svh max-w-3xl flex-col items-center justify-end px-4 pb-20 text-center">
         <Surtitre>Visite 360°</Surtitre>
         <h1 className="mt-5 font-serif text-hero font-medium">Entrez dans la boutique</h1>

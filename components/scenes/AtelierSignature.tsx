@@ -26,7 +26,7 @@ export function AtelierSignature() {
       const fil = el.querySelector<HTMLElement>("[data-fil]")!;
       gsap.fromTo(fil, { scaleY: 0 }, { scaleY: 1, ease: "none", scrollTrigger: { trigger: el.querySelector("[data-etapes]"), start: "top 70%", end: "bottom 60%", scrub: true } });
       el.querySelectorAll<HTMLElement>("[data-etape]").forEach((n) => {
-        gsap.from(n, { autoAlpha: 0, x: 24, duration: 1, ease: "expo.out", scrollTrigger: { trigger: n, start: "top 75%", once: true } });
+        gsap.from(n, { autoAlpha: 0, y: 24, duration: 1, ease: "expo.out", scrollTrigger: { trigger: n, start: "top 75%", once: true } });
         const point = n.querySelector("[data-point]");
         gsap.from(point, { scale: 0, duration: 0.6, ease: "back.out(1.6)", scrollTrigger: { trigger: n, start: "top 72%", once: true } });
       });

@@ -20,7 +20,7 @@ export default function PageMaison() {
     <Revelation>
       <section className="relative h-[78svh] min-h-[30rem] overflow-hidden">
         <Image src="/images/comptoir-accueil.jpg" alt="Le comptoir d’accueil de Maison Sensa, en travertin et noyer, sous l’enseigne." fill priority sizes="100vw" quality={85} className="object-cover object-[50%_40%]" />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ivoire via-ivoire/25 to-transparent" />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ivoire from-10% via-ivoire/70 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[90rem] px-4 pb-12 sm:px-8">
           <Surtitre>La Maison</Surtitre>
           <h1 className="mt-4 max-w-4xl font-serif text-hero font-medium">Votre identité, votre signature olfactive.</h1>

@@ -151,7 +151,7 @@ export function FlaconFamilles() {
         ))}
 
         {/* Flacon */}
-        <div className="absolute inset-x-0 bottom-[8%] top-[14%] md:inset-x-[22%] md:bottom-0 md:top-[6%]">
+        <div className="absolute inset-x-0 bottom-[36%] top-[11%] md:inset-x-[22%] md:bottom-0 md:top-[6%]">
           {mode === "3d" && <SceneFlacon etat={etat} mobile={mobile} />}
           {mode === "images" &&
             VUES_SECOURS.map((v, i) => (
