@@ -1,6 +1,6 @@
 # Maison Sensa : plan du site
 
-Statut : **étape 1 (analyse) terminée, en attente de validation.** Les sources du kit sont rangées dans `kit/` (briefs, `assets/`, `reference/`). `.env.local` est à la racine, exclu de Git.
+Statut : **plan validé ; flacon 3D validé** (comparaisons dans `docs/calibration/`) ; fonction 360° ajoutée (§6 bis). Les sources du kit sont rangées dans `kit/` (briefs, `assets/`, `reference/`). `.env.local` est à la racine, exclu de Git.
 
 ---
 
@@ -49,7 +49,7 @@ Palette du brief conservée telle quelle (`--ivoire` … `--encre-douce`), ajust
 /atelier              Atelier Signature + réservation en 3 étapes + FAQ
 /diagnostic           diagnostic olfactif (une question par écran) + résultat
 /boutique             catalogue
-/boutique/[slug]      fiche produit (visualiseur 3D pour parfum, recharge, atelier)
+/boutique/[slug]      fiche produit (visualiseur 360° pour toute la gamme)
 /panier               panier + commande simulée (coordonnées, retrait/livraison, récap, confirmation)
 /carte-cadeau         configurateur avec aperçu en direct
 /visite               visite 360° (maquette-360.html)
@@ -129,12 +129,24 @@ Règles transverses : transformations et opacités uniquement ; `prefers-reduced
 
 ---
 
-## 6. Flacon 3D (prochaine étape, avant tout le reste)
+## 6. Flacon 3D (validé)
 
 1. Modélisation procédurale en R3F selon `SPEC_FLACON_3D.md` : corps à arêtes arrondies (géométrie extrudée biseautée), cavité et jus séparés, tube plongeur, bague laiton à deux rainures, bouchon laqué, étiquette sur plaque (texture canvas 2 048 px avec Cormorant Garamond + Jost).
 2. Rendu sans écran avec Playwright + Chromium (WebGL logiciel), caméra orthographique de face, superposition à 50 % et côte à côte avec la photo dans `docs/calibration/`, itérations jusqu'à coïncidence des silhouettes ; puis trois quarts contre `trio-socles-travertin.jpg`.
 3. **Comparaison montrée avant de continuer.**
-4. Export GLB (GLTFExporter), rendus HD transparents (face, trois quarts G/D, dos, plongée). Ensuite, si le temps le permet : bougie, format voyage, coffret avec la même méthode.
+4. Export GLB (GLTFExporter, validé par le validateur Khronos), rendus HD transparents (face, trois quarts G/D, dos, plongée), détourés par la méthode des deux fonds (blanc / noir) pour garder la transparence réelle du verre.
+
+Réglages retenus après calibration : biais de 8° pour la photo de face ; jus en transmission réelle avec une légère lueur de contre-jour (reste doré devant un fond sombre) ; étiquette masquée dans le tampon de réfraction pour éviter son dédoublement.
+
+---
+
+## 6 bis. Fonction 360° (ajoutée à la demande)
+
+- **Toute la gamme en 3D :** flacon (fait), puis **bougie, format voyage 10 ml et coffret**, modélisés selon la même méthode, avec une comparaison aux photos montrée avant usage.
+- **`VisualiseurProduit`** (composant unique) : rotation libre au doigt ou à la souris, inertie douce, zoom limité, retour automatique face caméra, gravure prévisualisée sur le flacon. Accessible au clavier (flèches gauche/droite pour tourner, + / − pour zoomer), libellé et consigne pour les lecteurs d'écran.
+- **Où :** fiches produit (parfum, recharge, atelier, bougie, format voyage, coffret) ; bouton **Voir en 360°** dans le bandeau boutique de l'accueil, qui ouvre le visualiseur en plein écran (fenêtre modale, focus piégé dans la fenêtre, Échap pour fermer).
+- **Secours sans WebGL, sur mobile peu puissant ou avec `prefers-reduced-motion` :** séquence de 36 rendus HD (un tous les 10°) que l'on fait défiler au glisser. Avec `prefers-reduced-motion`, aucune rotation automatique.
+- **Chargement :** la 3D n'est chargée qu'à l'ouverture du visualiseur ; la première vue de la séquence s'affiche immédiatement.
 
 Limite connue : le conteneur n'a pas de GPU ; le rendu HD passera par SwiftShader, lent mais déterministe. La qualité finale du verre sera aussi vérifiée dans un vrai navigateur.
 
@@ -159,5 +171,5 @@ Captures Playwright de chaque page et de chaque scène à plusieurs positions de
 
 - **`maquette-360.html` n'est pas dans le kit** (zip séparé). Nécessaire pour `/visite` ; envoie-le quand tu peux.
 - **frontend-design :** pas encore installé dans cette session (UI UX Pro Max l'est déjà dans le dépôt). Installation à tenter au début de l'étape design system ; en cas d'échec, je le signale et je continue.
-- **Real-ESRGAN :** le paquet pip est téléchargeable ; les poids du modèle sont hébergés sur GitHub Releases, dont l'accès est restreint par le proxy du conteneur. Si le téléchargement échoue, je réduis les tailles d'affichage et adapte la mise en page (cadres, arches) plutôt que d'étirer les images.
+- **Real-ESRGAN :** fait. Les 13 grands visuels sont agrandis ×2 (`assets-src/x2/`) et contrôlés à 100 %.
 - **Emplacement :** le site est construit à la racine de ce dépôt (`Portfolio-`), à côté des skills existants.

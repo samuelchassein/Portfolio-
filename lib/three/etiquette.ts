@@ -136,3 +136,57 @@ export async function creerTextureEtiquette(opts: OptionsEtiquette = {}) {
   tex.needsUpdate = true;
   return tex;
 }
+
+export interface OptionsMarquage {
+  /** Couleur de l'encre (noir chaud pour la bougie, doré pour le tube et le coffret). */
+  couleur: string;
+  /** Largeur / hauteur de la zone imprimée. */
+  ratio: number;
+  /** Largeur occupée par SENSA, en fraction de la zone (MAISON = 70 % de SENSA). */
+  largeurSensa?: number;
+  /** Texte vertical (tube du format voyage : on lit de bas en haut). */
+  vertical?: boolean;
+  largeur?: number;
+}
+
+/**
+ * Wordmark imprimé sur fond transparent (sérigraphie sur verre, marquage à
+ * chaud doré) : « MAISON » espacé au-dessus de « SENSA ».
+ */
+export async function creerTextureMarquage(opts: OptionsMarquage) {
+  await chargerPolices();
+  const W = opts.largeur ?? 2048;
+  const H = Math.round(W / opts.ratio);
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d")!;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = opts.couleur;
+  ctx.textBaseline = "middle";
+
+  if (opts.vertical) {
+    ctx.translate(W / 2, H / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.translate(-H / 2, -W / 2);
+  }
+  const L = opts.vertical ? H : W;
+  const Hh = opts.vertical ? W : H;
+  const ls = (opts.largeurSensa ?? 0.6) * L;
+  const espSensa = 0.035;
+  const tSensa = ajusterTaille(ctx, (t) => `600 ${t}px SensaSerif, serif`, "SENSA", ls, espSensa);
+  const espMaison = 0.42;
+  const tMaison = ajusterTaille(ctx, (t) => `400 ${t}px SensaSans, sans-serif`, "MAISON", ls * 0.7, espMaison);
+  const bloc = tMaison * 0.75 + tSensa * 0.95;
+  const haut = Hh / 2 - bloc / 2;
+  ctx.font = `400 ${tMaison}px SensaSans, sans-serif`;
+  texteEspace(ctx, "MAISON", L / 2, haut + tMaison * 0.35, espMaison * tMaison);
+  ctx.font = `600 ${tSensa}px SensaSerif, serif`;
+  texteEspace(ctx, "SENSA", L / 2, haut + tMaison * 0.75 + tSensa * 0.5, espSensa * tSensa);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 16;
+  tex.needsUpdate = true;
+  return tex;
+}

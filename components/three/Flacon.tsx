@@ -89,6 +89,8 @@ export interface FlaconProps {
   qualite?: QualiteFlacon;
   /** Couleur vue à travers le verre quand rien n'est derrière (ambiance). */
   fondRefraction?: string;
+  /** Résolution du tampon de réfraction (défaut : 1 024, 512 sur mobile). */
+  resolutionRefraction?: number;
   onPret?: () => void;
 }
 
@@ -104,6 +106,7 @@ export const Flacon = forwardRef<THREE.Group, FlaconProps>(function Flacon(
     gravure,
     qualite = "haute",
     fondRefraction = "#e9dcc4",
+    resolutionRefraction,
     onPret,
   },
   ref,
@@ -208,7 +211,7 @@ export const Flacon = forwardRef<THREE.Group, FlaconProps>(function Flacon(
             attenuationDistance={4}
             envMapIntensity={reflets * 1.2}
             samples={qualite === "mobile" ? 4 : 10}
-            resolution={qualite === "mobile" ? 512 : 1024}
+            resolution={resolutionRefraction ?? (qualite === "mobile" ? 512 : 1024)}
             backside={false}
             specularIntensity={1}
           />
