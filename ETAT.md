@@ -16,9 +16,9 @@ Brief : `kit/PROMPT_CLAUDE_CODE.md` · Plan et décisions : `PLAN.md` · Branche
 
 ## Reste (ordre de priorité)
 
-1. `/atelier` + réservation 3 étapes (BookingProvider, .ics, profil diagnostic) + e-mails EmailJS (`lib/email.ts`, `emails/`).
-2. `/diagnostic` (questionnaire + résultat → réservation pré-remplie).
-3. `/boutique`, `/boutique/[slug]` (visualiseur 360°, gravure, recharge avec référence), `/panier` + commande simulée (PaymentProvider).
+1. ~~`/atelier` + réservation~~ fait. Reste : gabarits `emails/` + notice README.
+2. ~~`/diagnostic`~~ fait.
+3. ~~Boutique, fiches (visualiseur 360°), panier, commande simulée~~ fait (tests : recharge bloquée, atelier + bougie 45 €, commande).
 4. `/carte-cadeau` (aperçu en direct, `components/carte-cadeau/CarteCadeauVisuel.tsx` existe).
 5. `/maison`, `/contact`, pages légales, bandeau cookies, SEO (métadonnées, OG, sitemap, robots, LocalBusiness).
 6. `/visite` : **bloqué**, `maquette-360.html` manquant (zip séparé à fournir).

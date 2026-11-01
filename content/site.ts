@@ -44,6 +44,9 @@ export const SITE = {
     semainesOuvertes: 8,
   },
 
+  /** Frais de livraison en euros. null = « communiqués avant l'expédition » (à définir). */
+  fraisLivraison: null as number | null,
+
   legal: {
     raisonSociale: "[À COMPLÉTER : raison sociale]",
     formeJuridique: "[À COMPLÉTER : forme juridique et capital]",
