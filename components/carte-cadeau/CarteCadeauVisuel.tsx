@@ -54,7 +54,7 @@ export function CarteCadeauVisuel({
         <p className="mt-[2%] text-[clamp(0.55rem,1.35vw,0.78rem)] leading-snug text-encre-douce">
           {formule === "atelier" ? "Un atelier individuel et un parfum de 50 ml" : `D’une valeur de ${montant ? prix(montant) : "…"}`}
         </p>
-        <dl className="mt-[6%] w-full space-y-[3%] text-left text-[clamp(0.55rem,1.35vw,0.8rem)]">
+        <dl className="mt-[6%] w-full space-y-[3%] px-[5%] text-left text-[clamp(0.55rem,1.35vw,0.8rem)]">
           <div className="flex items-end gap-2">
             <dt className="shrink-0 font-serif italic">Pour :</dt>
             <dd className="min-w-0 flex-1 truncate border-b border-encre/40 pb-[1px] font-serif text-[1.15em]">{pour || " "}</dd>
@@ -64,7 +64,7 @@ export function CarteCadeauVisuel({
             <dd className="min-w-0 flex-1 truncate border-b border-encre/40 pb-[1px] font-serif text-[1.15em]">{de || " "}</dd>
           </div>
         </dl>
-        {message && <p className="mt-[3%] line-clamp-2 w-full text-left font-serif text-[clamp(0.55rem,1.3vw,0.78rem)] italic text-encre-douce">« {message} »</p>}
+        {message && <p className="mt-[3%] line-clamp-2 w-full px-[5%] text-left font-serif text-[clamp(0.55rem,1.3vw,0.78rem)] italic text-encre-douce">« {message} »</p>}
       </div>
       <div className="relative bg-vert">
         <span aria-hidden="true" className="absolute inset-[5%] border border-dore/50" />
