@@ -58,7 +58,10 @@ export const PRODUITS: Produit[] = [
     gravure: true,
     modele: "flacon",
     visuel: "flacon-trois-quarts-gauche",
-    galerie: [{ src: "/images/atelier-conseil-client.jpg", alt: "Une conseillère et un client sentent une mouillette à la table de l’atelier." }],
+    galerie: [
+      { src: "/images/atelier-conseil-client.jpg", alt: "Une conseillère et un client sentent une mouillette à la table de l’atelier." },
+      { src: "/renders/scenes/flacon-boutique.webp", alt: "Le flacon Maison Sensa sur un socle en travertin, dans la lumière de la boutique." },
+    ],
   },
   ...(Object.keys(NOMS_BOUGIES) as CleFamille[]).map((f) => ({
     slug: `bougie-${f}`,
@@ -70,7 +73,10 @@ export const PRODUITS: Produit[] = [
     famille: f,
     modele: "bougie" as const,
     visuel: "bougie-trois-quarts-gauche",
-    galerie: [{ src: "/images/produits/bougie-affiche.jpg", alt: "La bougie parfumée Maison Sensa allumée sur un socle en travertin." }],
+    galerie: [
+      { src: "/images/produits/bougie-affiche.jpg", alt: "La bougie parfumée Maison Sensa allumée sur un socle en travertin." },
+      { src: "/renders/scenes/bougie-boutique.webp", alt: "La bougie Maison Sensa sur un socle en travertin, dans la lumière de la boutique." },
+    ],
   })),
   {
     slug: "format-voyage",
@@ -82,7 +88,10 @@ export const PRODUITS: Produit[] = [
     prix: PRIX.voyage,
     modele: "format-voyage",
     visuel: "format-voyage-trois-quarts-gauche",
-    galerie: [{ src: "/images/produits/voyage-affiche.jpg", alt: "Le format voyage Maison Sensa sur un socle en travertin." }],
+    galerie: [
+      { src: "/images/produits/voyage-affiche.jpg", alt: "Le format voyage Maison Sensa sur un socle en travertin." },
+      { src: "/renders/scenes/format-voyage-boutique.webp", alt: "Le format voyage Maison Sensa posé sur le travertin, dans la lumière de la boutique." },
+    ],
   },
   {
     slug: "recharge",
@@ -108,6 +117,7 @@ export const PRODUITS: Produit[] = [
     prix: PRIX.coffret,
     modele: "coffret",
     visuel: "coffret-trois-quarts-gauche",
+    galerie: [{ src: "/renders/scenes/coffret-boutique.webp", alt: "Le coffret vert Maison Sensa sur un socle en travertin, dans la lumière de la boutique." }],
   },
   {
     slug: "carte-cadeau",

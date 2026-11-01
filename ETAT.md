@@ -7,7 +7,7 @@ Brief : `kit/PROMPT_CLAUDE_CODE.md` · Plan et décisions : `PLAN.md` · Branche
 
 - **Plan** validé (`PLAN.md`) : direction « Galerie minérale », Cormorant Garamond + Jost.
 - **3D** (`components/three/`) : flacon calibré sur la photo (`docs/calibration/`), bougie, format voyage, coffret ; GLB dans `public/models/`.
-- **Rendus Blender** (`scripts/blender/rendu.py`, `produire.sh` reprenable) : fait pour flacon (5 vues), bougie, format voyage, coffret (3 vues chacun), 360° des 4 produits, scène gamme, scènes boutique flacon et gamme. Reste : scènes boutique bougie, format voyage, coffret (relancer `produire.sh`, il saute l’existant). Conversion : `node scripts/convertir-rendus.mjs`.
+- **Rendus Blender** : tous faits (studio, 360° des 4 produits, scènes boutique, utilisées dans les galeries des fiches produit). Relance : `produire.sh` (saute l’existant), puis `node scripts/convertir-rendus.mjs`.
 - **Images** : agrandies ×2 (`assets-src/x2/` → `public/images/`), recadrages d'affiches (`public/images/produits/`), mur des familles recadré et étiquettes floutées (`mur-familles-haut.jpg`).
 - **Design system** validé : `app/globals.css` (tokens), `components/brand/*`, `components/ui/*`, page `/styleguide`.
 - **Habillage** : `app/(site)/layout.tsx` (en-tête, pied, tiroir panier, Lenis).
@@ -22,7 +22,7 @@ Brief : `kit/PROMPT_CLAUDE_CODE.md` · Plan et décisions : `PLAN.md` · Branche
 4. ~~`/carte-cadeau`~~ fait.
 5. ~~`/maison`, `/contact`, pages légales, bandeau cookies, SEO~~ fait.
 6. `/visite` : page prête ; s’active seule dès que `public/visite-360/maquette-360.html` est déposé (fichier toujours manquant).
-7. ~~Vérification groupée (1 440 / 375, sans animation), build de production~~ fait. Reste : Lighthouse, à lancer quand Blender aura fini (CPU occupé).
+7. ~~Vérification groupée, build de production, Lighthouse~~ fait (build de prod : accessibilité, bonnes pratiques, SEO à 100 ; perf mobile 54 accueil (3D), 89 atelier, 81 fiche produit ; bureau 69 / 100 / 99).
 8. Tests e-mails réels après collage des gabarits dans EmailJS par la personne.
 
 ## Mode de travail

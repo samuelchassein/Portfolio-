@@ -114,9 +114,9 @@ function EtapeCreneau({ choisi, onChoisir, onSuivant }: { choisi: string | null;
             ›
           </button>
         </div>
-        <div role="grid" aria-label={`Jours de ${nomMois}`} className="mt-4 grid grid-cols-7 gap-1 text-center">
+        <div role="group" aria-label={`Jours de ${nomMois}`} className="mt-4 grid grid-cols-7 gap-1 text-center">
           {JOURS_SEMAINE.map((j) => (
-            <div key={j} role="columnheader" className="pb-2 text-xs uppercase tracking-[0.12em] text-encre-douce">
+            <div key={j} aria-hidden="true" className="pb-2 text-xs uppercase tracking-[0.12em] text-encre-douce">
               {j}
             </div>
           ))}
@@ -131,9 +131,8 @@ function EtapeCreneau({ choisi, onChoisir, onSuivant }: { choisi: string | null;
               <button
                 key={iso}
                 type="button"
-                role="gridcell"
                 disabled={!ouvert}
-                aria-selected={actif}
+                aria-pressed={actif}
                 aria-label={new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date(`${iso}T12:00`)) + (ouvert ? "" : ", fermé")}
                 onClick={() => setJour(iso)}
                 className={`flex aspect-square min-h-11 cursor-pointer items-center justify-center font-serif text-lg tabular-nums transition-colors duration-300 disabled:cursor-default disabled:text-encre/25 ${

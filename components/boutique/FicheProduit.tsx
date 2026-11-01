@@ -53,7 +53,7 @@ export function FicheProduit({ produit }: { produit: Produit }) {
           </div>
         )}
         {produit.galerie?.map((g) => (
-          <div key={g.src} className="relative aspect-[6/5] overflow-hidden">
+          <div key={g.src} className={`relative overflow-hidden ${g.src.startsWith("/renders/") ? "aspect-[4/5]" : "aspect-[6/5]"}`}>
             <Image src={g.src} alt={g.alt} fill sizes="(min-width: 1024px) 46vw, 100vw" quality={85} className="object-cover" />
           </div>
         ))}
