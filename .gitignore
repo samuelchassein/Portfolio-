@@ -10,3 +10,4 @@ __pycache__/
 .next-studio2/
 tmp-360/
 .next-prod/
+.netlify
