@@ -35,6 +35,8 @@ export const SITE = {
     dureeMin: 45,
     dureeMax: 60,
     contenance: "50 ml",
+    /** Délai de confirmation d'une demande de rendez-vous (repris du template e-mail client). */
+    delaiConfirmation: "sous 24 h ouvrées",
     /** Délai de remise du parfum créé en atelier. */
     delaiRemise: "précisé lors de votre réservation",
     /** Créneaux proposés à la réservation (jours : 0 = dimanche … 6 = samedi). */

@@ -241,10 +241,10 @@ function EtapeInfos({ creneau, onRetour, onConfirme }: { creneau: string; onReto
           client: { nom: `${r.prenom} ${r.nom}`, email: r.email, telephone: r.telephone },
           sujetClient: `Votre Atelier Signature du ${dateHeure}`,
           sujetBoutique: `Nouvelle réservation ${r.reference} : ${dateHeure}`,
-          titreClient: "Votre atelier est réservé",
+          titreClient: "Votre demande d’atelier est bien reçue",
           titreBoutique: "Nouvelle réservation",
           introClient: `Bonjour ${r.prenom}, nous avons hâte de vous accueillir pour composer votre parfum.`,
-          introBoutique: `${r.prenom} ${r.nom} a réservé un Atelier Signature.`,
+          introBoutique: `${r.prenom} ${r.nom} demande un Atelier Signature.`,
           lignes,
           total: prix(SITE.atelier.prix),
           message: r.message,
@@ -333,7 +333,7 @@ function EtapeConfirmation({ resa, emailEnvoye }: { resa: Resa; emailEnvoye: boo
   return (
     <div className="mt-8 max-w-2xl" role="status">
       <CadreDore double className="bg-ivoire-clair px-8 py-10 sm:px-12">
-        <p className="text-surtitre uppercase tracking-[0.36em] text-dore-texte">Atelier Signature réservé</p>
+        <p className="text-surtitre uppercase tracking-[0.36em] text-dore-texte">Demande d’atelier envoyée</p>
         <p className="mt-5 font-serif text-3xl font-medium first-letter:uppercase">{dateHeure}</p>
         <dl className="mt-8 grid gap-4 sm:grid-cols-2">
           <div>
@@ -352,9 +352,8 @@ function EtapeConfirmation({ resa, emailEnvoye }: { resa: Resa; emailEnvoye: boo
           </div>
         </dl>
         <p className="mt-8">
-          {emailEnvoye === false
-            ? "Votre réservation est bien enregistrée. L’e-mail de confirmation n’a pas pu partir : notez votre référence, nous vous confirmerons le rendez-vous."
-            : "Vous recevrez une confirmation par e-mail."}
+          Notre équipe vérifie le créneau et vous confirme le rendez-vous par e-mail {SITE.atelier.delaiConfirmation}.{" "}
+          {emailEnvoye === true ? "Un récapitulatif de votre demande vient de vous être envoyé." : "Notez votre référence."}
         </p>
         <p className="mt-2 text-sm text-encre-douce">Délai de remise de votre parfum : {SITE.atelier.delaiRemise}.</p>
         <div className="mt-8 flex flex-wrap gap-4">
