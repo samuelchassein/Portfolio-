@@ -140,6 +140,13 @@ Réglages retenus après calibration : biais de 8° pour la photo de face ; jus 
 
 ---
 
+## 6 ter. Rendus photoréalistes Blender (ajoutés à la demande)
+
+- **Images produit et 360° : Blender (Cycles)** à partir des GLB, via `scripts/blender/rendu.py` (Blender en module Python). Verre creusé d'une vraie cavité, jus à absorption volumique dorée, laque, laiton, papier ; éclairage de fin d'après-midi en softboxes chaudes.
+- **Studio :** fond détouré, mais le verre réfracte l'ivoire du site (#F6EDDD) : posé sur la page, le flacon paraît réellement transparent.
+- **Mises en scène « boutique » :** socle en travertin, mur en noyer cannelé flou, soleil filtré par un feuillage ; plus une scène de la gamme complète.
+- **Sur le site, le flacon interactif reste celui du navigateur** (React Three Fiber) ; les rendus Blender servent aux fiches, au 360° de secours, au partage et au film.
+
 ## 6 bis. Fonction 360° (ajoutée à la demande)
 
 - **Toute la gamme en 3D :** flacon (fait), puis **bougie, format voyage 10 ml et coffret**, modélisés selon la même méthode, avec une comparaison aux photos montrée avant usage.
