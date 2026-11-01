@@ -16,13 +16,13 @@ Brief : `kit/PROMPT_CLAUDE_CODE.md` · Plan et décisions : `PLAN.md` · Branche
 
 ## Reste (ordre de priorité)
 
-1. ~~`/atelier` + réservation~~ fait. Reste : gabarits `emails/` + notice README.
+1. ~~`/atelier`, réservation, gabarits `emails/`, notice README~~ fait.
 2. ~~`/diagnostic`~~ fait.
 3. ~~Boutique, fiches (visualiseur 360°), panier, commande simulée~~ fait (tests : recharge bloquée, atelier + bougie 45 €, commande).
 4. ~~`/carte-cadeau`~~ fait.
 5. ~~`/maison`, `/contact`, pages légales, bandeau cookies, SEO~~ fait.
 6. `/visite` : page prête ; s’active seule dès que `public/visite-360/maquette-360.html` est déposé (fichier toujours manquant).
-7. Vérification groupée (captures 1 440 / 375, sans animation), Lighthouse, README.
+7. Vérification groupée (captures 1 440 / 375, sans animation), Lighthouse. README fait.
 8. Tests e-mails réels après collage des gabarits dans EmailJS par la personne.
 
 ## Mode de travail

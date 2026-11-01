@@ -1,0 +1,12 @@
+MAISON SENSA · Notification ({{type}})
+{{titre}}
+
+{{intro}}
+
+{{details_texte}}
+
+Client : {{client_nom}} · {{client_email}} · {{client_telephone}}
+Message : {{message}}
+{{total}}
+
+Référence : {{reference}}

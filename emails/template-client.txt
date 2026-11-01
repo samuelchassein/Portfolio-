@@ -1,0 +1,14 @@
+MAISON SENSA
+{{titre}}
+
+{{intro}}
+
+{{details_texte}}
+
+{{message}}
+{{total}}
+
+--
+Maison Sensa · Votre identité, votre signature olfactive.
+{{boutique_adresse}} · {{boutique_email}}
+Référence : {{reference}}

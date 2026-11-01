@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>{{subject}}</title>
+</head>
+<body style="margin:0;padding:0;background:#F6EDDD;">
+<!-- Maison Sensa : gabarit BOUTIQUE à coller dans EmailJS (onglet Content, mode « Code »). -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6EDDD;">
+<tr><td align="center" style="padding:32px 12px;">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FBF6EE;border:1px solid #E8DCC8;">
+    <tr><td align="center" style="padding:40px 40px 8px 40px;">
+      <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:7px;color:#1C1A17;">MAISON</div>
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:40px;letter-spacing:4px;color:#1C1A17;line-height:1.1;">SENSA</div>
+      <div style="width:48px;height:1px;background:#C9A26A;margin:22px auto 0 auto;line-height:1px;font-size:1px;">&nbsp;</div>
+    </td></tr>
+    <tr><td style="padding:24px 40px 0 40px;">
+      <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#7A5D2C;">Notification · {{type}}</div>
+      <h1 style="margin:10px 0 0 0;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:30px;line-height:1.2;color:#1C1A17;">{{titre}}</h1>
+      <p style="margin:16px 0 0 0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.6;color:#5B544A;">{{intro}}</p>
+    </td></tr>
+    <tr><td style="padding:24px 40px 0 40px;">{{{details_html}}}</td></tr>
+    <tr><td style="padding:16px 40px 0 40px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.6;color:#1C1A17;"><strong style="font-weight:normal;color:#7A5D2C;">Client :</strong> {{client_nom}} · {{client_email}} · {{client_telephone}}<br>{{message}}</td></tr>
+    <tr><td style="padding:24px 40px 0 40px;font-family:Georgia,'Times New Roman',serif;font-size:20px;color:#1F3A2E;">{{total}}</td></tr>
+    <tr><td align="center" style="padding:32px 40px 40px 40px;">
+      <table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="background:#1F3A2E;">
+        <a href="mailto:{{client_email}}" style="display:inline-block;padding:15px 30px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#FBF6EE;text-decoration:none;">Répondre au client</a>
+      </td></tr></table>
+    </td></tr>
+    <tr><td align="center" style="background:#1F3A2E;padding:28px 40px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;line-height:1.7;color:#E8DCC8;">
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:18px;letter-spacing:3px;color:#D4AC70;">MAISON SENSA</div>
+      <div style="font-style:italic;font-family:Georgia,'Times New Roman',serif;color:#FBF6EE;">Votre identité, votre signature olfactive.</div>
+      <div style="margin-top:8px;">{{boutique_adresse}}</div>
+      <div><a href="mailto:{{boutique_email}}" style="color:#D4AC70;">{{boutique_email}}</a></div>
+      <div style="margin-top:8px;color:#B9AE99;font-size:11px;">Référence : {{reference}}</div>
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body>
+</html>
