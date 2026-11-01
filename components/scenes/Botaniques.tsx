@@ -8,7 +8,7 @@ import type { CleFamille } from "@/content/familles";
  * profondeur (0 = loin et flou, 1 = proche et net) utilisée pour la parallaxe.
  */
 
-type Forme = "zeste" | "feuille" | "petale" | "chene" | "copeau" | "goutte" | "vanille" | "brin";
+export type Forme = "zeste" | "feuille" | "petale" | "chene" | "copeau" | "goutte" | "vanille" | "brin";
 
 export interface Element {
   forme: Forme;
@@ -87,7 +87,7 @@ const CHENE = (() => {
   return pts.join(" ");
 })();
 
-function Dessin({ forme }: { forme: Forme }) {
+export function DessinBotanique({ forme }: { forme: Forme }) {
   switch (forme) {
     case "zeste":
       return (
@@ -217,7 +217,7 @@ export function CoucheBotanique({ famille, mobile = false }: { famille: CleFamil
             zIndex: e.profondeur > 0.7 ? 3 : 1,
           }}
         >
-          <Dessin forme={e.forme} />
+          <DessinBotanique forme={e.forme} />
         </div>
       ))}
     </div>

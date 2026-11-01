@@ -128,7 +128,7 @@ function EtapeCreneau({ choisi, onChoisir, onSuivant }: { choisi: string | null;
                 type="button"
                 role="gridcell"
                 disabled={!ouvert}
-                aria-pressed={actif}
+                aria-selected={actif}
                 aria-label={new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date(`${iso}T12:00`)) + (ouvert ? "" : ", fermé")}
                 onClick={() => setJour(iso)}
                 className={`flex aspect-square min-h-11 cursor-pointer items-center justify-center font-serif text-lg tabular-nums transition-colors duration-300 disabled:cursor-default disabled:text-encre/25 ${
