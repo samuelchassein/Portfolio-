@@ -5,6 +5,9 @@
  * Chaque action envoie deux e-mails avec le même jeu de variables :
  *  - au client (template CLIENT) ;
  *  - à Maison Sensa (template BOUTIQUE).
+ * Les templates sont ceux déjà configurés dans le compte EmailJS : on envoie
+ * donc aussi les noms de variables usuels d'EmailJS (name, email, title,
+ * message, time, from_name…), et `message` contient le récapitulatif complet.
  * Si une variable manque, rien n'est envoyé, le parcours reste confirmé à
  * l'écran et un avertissement s'affiche en console de développement.
  */
@@ -38,6 +41,17 @@ export interface VariablesEmail {
   message: string;
   boutique_adresse: string;
   boutique_email: string;
+  /* Noms usuels des templates EmailJS existants. */
+  name: string;
+  email: string;
+  title: string;
+  time: string;
+  from_name: string;
+  from_email: string;
+  user_name: string;
+  user_email: string;
+  phone: string;
+  message_client: string;
 }
 
 export interface ResultatEnvoi {
@@ -84,16 +98,31 @@ export async function envoyerEmails(e: Envoi): Promise<ResultatEnvoi> {
     return { client: false, boutique: false, configure: false };
   }
   const { default: emailjs } = await import("@emailjs/browser");
+  const aLibelle = (l: string) => e.lignes.some(([k]) => k === l);
+  const lignesTotal: [string, string][] = e.total && !aLibelle("Total") ? [...e.lignes, ["Total", e.total]] : e.lignes;
+  /** Récapitulatif lisible en texte : tout ce qu'un template affichant {{message}} doit montrer. */
+  const recap = (intro: string) =>
+    [intro, e.reference && !aLibelle("Référence") ? `Référence : ${e.reference}` : "", detailsTexte(lignesTotal), e.client.telephone ? `Téléphone : ${e.client.telephone}` : "", e.message ? `Message :\n${e.message}` : ""]
+      .filter(Boolean)
+      .join("\n\n");
   const commun = {
+    name: e.client.nom,
+    email: e.client.email,
+    from_name: e.client.nom,
+    from_email: e.client.email,
+    user_name: e.client.nom,
+    user_email: e.client.email,
+    phone: e.client.telephone ?? "",
+    time: new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(new Date()),
+    message_client: e.message ?? "",
     type: e.type,
     reference: e.reference,
-    details_html: detailsHTML(e.lignes),
-    details_texte: detailsTexte(e.lignes),
+    details_html: detailsHTML(lignesTotal),
+    details_texte: detailsTexte(lignesTotal),
     total: e.total ?? "",
     client_nom: e.client.nom,
     client_email: e.client.email,
     client_telephone: e.client.telephone ?? "",
-    message: e.message ?? "",
     boutique_adresse: adresseComplete(),
     boutique_email: SITE.email,
   };
@@ -103,8 +132,10 @@ export async function envoyerEmails(e: Envoi): Promise<ResultatEnvoi> {
     to_name: e.client.nom,
     reply_to: SITE.email,
     subject: e.sujetClient,
+    title: e.sujetClient,
     titre: e.titreClient,
     intro: e.introClient,
+    message: recap(e.introClient),
   };
   const pourBoutique: VariablesEmail = {
     ...commun,
@@ -112,8 +143,10 @@ export async function envoyerEmails(e: Envoi): Promise<ResultatEnvoi> {
     to_name: "Maison Sensa",
     reply_to: e.client.email,
     subject: e.sujetBoutique,
+    title: e.sujetBoutique,
     titre: e.titreBoutique,
     intro: e.introBoutique,
+    message: recap(e.introBoutique),
   };
   const options = { publicKey: CONFIG.cle! };
   const [rc, rb] = await Promise.allSettled([

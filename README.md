@@ -42,30 +42,32 @@ Toutes ces valeurs sont des **exemples** à remplacer :
 - [ ] `content/produits.ts` → `PRIX.coffret`
 - [ ] Pages légales (`app/(site)/(legal)/`) : tous les passages **[À COMPLÉTER]** (rétractation, cartes cadeaux, médiateur, durées de conservation, prestataire de paiement)
 - [ ] Le plan stylisé de la page d'accueil (`components/scenes/VisiteCarteInfos.tsx`, `PlanStylise`) est indicatif : à aligner sur l'adresse réelle
-- [ ] EmailJS : coller les gabarits et autoriser le domaine (section suivante)
+- [ ] EmailJS : autoriser le domaine du site (section suivante)
 
-## E-mails avec EmailJS (à faire une fois)
+## E-mails avec EmailJS
 
-Chaque action (réservation, commande, contact) envoie **deux e-mails** : un au client, une notification à Maison Sensa. Les deux templates EmailJS reçoivent le même jeu de variables.
+Chaque action (réservation, commande, contact) envoie **deux e-mails** avec les **templates déjà configurés** dans le compte EmailJS de maison.sensaproject@gmail.com : le template client (`NEXT_PUBLIC_EMAILJS_TEMPLATE_CLIENT`) et le template boutique (`NEXT_PUBLIC_EMAILJS_TEMPLATE_BOUTIQUE`). Rien n'est à recoller dans EmailJS.
 
-1. Connectez-vous sur [emailjs.com](https://www.emailjs.com) avec le compte de maison.sensaproject@gmail.com.
-2. **Template client** (`NEXT_PUBLIC_EMAILJS_TEMPLATE_CLIENT`) : Email Templates → ouvrez-le → onglet **Content** → bouton **Edit Content** → mode **Code** → collez tout le contenu de `emails/template-client.html`. Dans les réglages du template :
-   - **To Email** : `{{to_email}}`
-   - **Subject** : `{{subject}}`
-   - **Reply To** : `maison.sensaproject@gmail.com`
-   - (facultatif) version texte : collez `emails/template-client.txt`.
-3. **Template boutique** (`NEXT_PUBLIC_EMAILJS_TEMPLATE_BOUTIQUE`) : même chose avec `emails/template-boutique.html`, puis :
-   - **To Email** : `maison.sensaproject@gmail.com`
-   - **Subject** : `{{subject}}`
-   - **Reply To** : `{{reply_to}}` (vous répondez directement au client)
-4. **Account → Security** : ajoutez le domaine du site (et `localhost` pour les essais) dans les **domaines autorisés**, et activez la **limite d'envois** (protection contre les abus).
-5. Ajoutez les 5 variables dans Vercel ou Netlify au déploiement (voir plus haut).
+Pour rester compatible avec ces templates, le site envoie les noms de variables usuels d'EmailJS, avec les mêmes valeurs dans les deux e-mails :
 
-**Attention :** l'offre gratuite d'EmailJS est limitée en nombre d'envois par mois, et **chaque action en consomme deux**.
+| Variable | Contenu |
+|---|---|
+| `name`, `from_name`, `user_name`, `to_name` | nom du client (`to_name` vaut « Maison Sensa » pour l'e-mail boutique) |
+| `email`, `from_email`, `user_email` | e-mail du client |
+| `to_email` | destinataire : le client, ou maison.sensaproject@gmail.com pour la boutique |
+| `reply_to` | adresse de réponse : Maison Sensa pour le client, le client pour la boutique |
+| `title`, `subject` | objet de l'e-mail |
+| `message` | **récapitulatif complet** en texte : introduction, référence, détails, total, téléphone, message du client |
+| `time` | date et heure de l'envoi (heure de Paris) |
+| `phone` | téléphone du client (si fourni) |
 
-Variables envoyées à chaque fois : `to_email`, `to_name`, `reply_to`, `subject`, `type` (reservation / commande / contact), `titre`, `intro`, `reference`, `details_html` (tableau HTML, à insérer avec `{{{details_html}}}`), `details_texte`, `total`, `client_nom`, `client_email`, `client_telephone`, `message`, `boutique_adresse`, `boutique_email`.
+Variables supplémentaires disponibles si un template les utilise : `type`, `titre`, `intro`, `reference`, `details_texte`, `details_html` (à insérer avec `{{{details_html}}}`), `total`, `client_nom`, `client_email`, `client_telephone`, `message_client`, `boutique_adresse`, `boutique_email`.
 
-Si une variable d'environnement manque, le site fonctionne quand même (confirmation à l'écran, avertissement en console de développement). Si un seul des deux e-mails part, le parcours reste confirmé côté visiteur et l'erreur est journalisée. Protection anti-abus : champ piège invisible, délai minimum avant envoi, bouton désactivé pendant l'envoi. La **clé privée** EmailJS n'est jamais utilisée.
+**Au moment de la mise en ligne :** ajoutez le domaine du site dans les domaines autorisés d'EmailJS (Account → Security), et les 5 variables dans Vercel ou Netlify (voir plus haut).
+
+**Quota :** l'offre gratuite d'EmailJS limite le nombre d'envois par mois et **chaque action en consomme deux**. Une fois la limite atteinte, les envois échouent jusqu'au mois suivant : le parcours reste confirmé à l'écran pour le visiteur (message de secours) et l'erreur est journalisée.
+
+Si une variable d'environnement manque, le site fonctionne quand même (confirmation à l'écran, avertissement en console de développement). Protection anti-abus : champ piège invisible, délai minimum avant envoi, bouton désactivé pendant l'envoi. La **clé privée** EmailJS n'est jamais utilisée.
 
 ## Brancher plus tard une vraie réservation ou un vrai paiement
 
@@ -86,7 +88,6 @@ components/ui        boutons, champs de formulaire
 content/             contenus modifiables
 lib/                 e-mails, réservation, paiement, .ics, anti-abus
 stores/              panier (règle bougie 45 € avec atelier), profil du diagnostic
-emails/              gabarits EmailJS (HTML + texte)
 public/models        modèles 3D GLB (réutilisables par le film)
 public/renders       rendus Blender HD (PNG + WebP), 360° et mises en scène
 scripts/             outils : rendus Blender, captures, détourage, wordmark

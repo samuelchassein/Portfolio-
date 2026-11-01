@@ -16,14 +16,14 @@ Brief : `kit/PROMPT_CLAUDE_CODE.md` · Plan et décisions : `PLAN.md` · Branche
 
 ## Reste (ordre de priorité)
 
-1. ~~`/atelier`, réservation, gabarits `emails/`, notice README~~ fait.
+1. ~~`/atelier`, réservation, notice README~~ fait.
 2. ~~`/diagnostic`~~ fait.
 3. ~~Boutique, fiches (visualiseur 360°), panier, commande simulée~~ fait (tests : recharge bloquée, atelier + bougie 45 €, commande).
 4. ~~`/carte-cadeau`~~ fait.
 5. ~~`/maison`, `/contact`, pages légales, bandeau cookies, SEO~~ fait.
 6. ~~/visite~~ fait : la maquette 360° fournie est reconstruite dans le site (`components/visite/`, contenus dans `content/visite.ts`), aux couleurs de la marque, 5 espaces clients, visite guidée, clavier, repli en images sans WebGL. Lighthouse : accessibilité, bonnes pratiques, SEO à 100.
 7. ~~Vérification groupée, build de production, Lighthouse~~ fait (build de prod : accessibilité, bonnes pratiques, SEO à 100 ; perf mobile 54 accueil (3D), 89 atelier, 81 fiche produit ; bureau 69 / 100 / 99).
-8. Tests e-mails réels après collage des gabarits dans EmailJS par la personne.
+8. E-mails : on garde les templates EmailJS existants de la personne (gabarits `emails/` supprimés à sa demande) ; `lib/email.ts` envoie les variables usuelles d’EmailJS (`name`, `email`, `title`, `message` = récapitulatif complet, `time`…). Test réel à faire quand le quota mensuel EmailJS sera rechargé.
 
 ## Mode de travail
 

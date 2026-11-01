@@ -82,7 +82,6 @@ lib/
   payment/                  PaymentProvider (interface) + SimulatedPaymentProvider
   ics.ts, prix.ts (règle bougie 45 € avec atelier), anti-abus.ts
 stores/                     panier, profil (diagnostic), reservation (Zustand + persist sous try/catch)
-emails/                     template-client.html, template-boutique.html (+ versions texte)
 public/models/              flacon-maison-sensa.glb
 public/renders/             rendus HD transparents (PNG + WebP, ≥ 2 400 px de haut)
 public/images/              visuels traités (recadrés, agrandis, AVIF/WebP)
@@ -170,7 +169,7 @@ Limite connue : le conteneur n'a pas de GPU ; le rendu HD passera par SwiftShade
 
 ## 8. Vérification
 
-Captures Playwright de chaque page et de chaque scène à plusieurs positions de scroll, en 1 440 × 900 et 375 × 812 avec `deviceScaleFactor: 2`, plus le mode `prefers-reduced-motion`. Script de contrôle automatique de la règle « taille affichée × densité ≤ largeur native × 1,25 » sur toutes les `<img>`. Lighthouse sur les pages principales. Parcours complets : diagnostic → réservation pré-remplie ; atelier + bougie à 45 € ; recharge sans référence bloquée ; carte cadeau personnalisée. E-mails réels envoyés seulement après ta confirmation que les gabarits sont collés dans EmailJS.
+Captures Playwright de chaque page et de chaque scène à plusieurs positions de scroll, en 1 440 × 900 et 375 × 812 avec `deviceScaleFactor: 2`, plus le mode `prefers-reduced-motion`. Script de contrôle automatique de la règle « taille affichée × densité ≤ largeur native × 1,25 » sur toutes les `<img>`. Lighthouse sur les pages principales. Parcours complets : diagnostic → réservation pré-remplie ; atelier + bougie à 45 € ; recharge sans référence bloquée ; carte cadeau personnalisée. E-mails réels envoyés avec les templates EmailJS existants, quand le quota le permet.
 
 ---
 
