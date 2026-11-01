@@ -223,6 +223,7 @@ function EtapeInfos({ creneau, onRetour, onConfirme }: { creneau: string; onReto
       let emailOk: boolean | null = null;
       if (estHumain()) {
         const { dateHeure } = formaterCreneau(r.debut);
+        const debut = new Date(r.debut);
         const lignes: [string, string][] = [
           ["Référence", r.reference],
           ["Date et heure", dateHeure],
@@ -247,6 +248,9 @@ function EtapeInfos({ creneau, onRetour, onConfirme }: { creneau: string; onReto
           lignes,
           total: prix(SITE.atelier.prix),
           message: r.message,
+          formule: `Atelier Signature · parfum ${SITE.atelier.contenance} · ${prix(SITE.atelier.prix)}${r.pour === "offrir" ? " · pour offrir" : ""}`,
+          dateLabel: new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(debut),
+          heureLabel: new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(debut).replace(":", " h "),
         });
         emailOk = res.configure ? res.client : null;
       }

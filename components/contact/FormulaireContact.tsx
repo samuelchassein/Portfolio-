@@ -46,7 +46,7 @@ export function FormulaireContact() {
         lignes: [["Nom", nom], ["E-mail", v.email.trim()], ...(v.sujet.trim() ? ([["Sujet", v.sujet.trim()]] as [string, string][]) : [])],
         message: v.message.trim(),
       });
-      setAccuse(res.client);
+      setAccuse(res.client === true);
     }
     setEnvoi(false);
     setEnvoye(true);

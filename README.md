@@ -46,22 +46,35 @@ Toutes ces valeurs sont des **exemples** à remplacer :
 
 ## E-mails avec EmailJS
 
-Chaque action (réservation, commande, contact) envoie **deux e-mails** avec les **templates déjà configurés** dans le compte EmailJS de maison.sensaproject@gmail.com : le template client (`NEXT_PUBLIC_EMAILJS_TEMPLATE_CLIENT`) et le template boutique (`NEXT_PUBLIC_EMAILJS_TEMPLATE_BOUTIQUE`). Rien n'est à recoller dans EmailJS.
+Le site utilise les **deux templates déjà configurés** dans le compte EmailJS de maison.sensaproject@gmail.com (conçus pour les demandes d'atelier). Rien n'est à recoller dans EmailJS.
 
-Pour rester compatible avec ces templates, le site envoie les noms de variables usuels d'EmailJS, avec les mêmes valeurs dans les deux e-mails :
+| Action | Template client (au client) | Template boutique (à Maison Sensa) |
+|---|---|---|
+| Réservation d'atelier | oui | oui |
+| Commande | non (confirmation à l'écran) | oui |
+| Message de contact | non (confirmation à l'écran) | oui |
+
+Le template client parle de « demande d'atelier » : il n'est donc envoyé que pour les réservations. Pour les commandes et les messages, la boutique reçoit la notification et répond au client (« Répondre » renvoie vers lui). Si un jour le template client devient générique, il suffit de changer `avecClient` dans `lib/email.ts`.
+
+Réglages des templates (à ne pas modifier) :
+- **Template client** : To Email `{{to_email}}`, Reply To `{{reply_to}}`.
+- **Template boutique** : To Email maison.sensaproject@gmail.com, Reply To `{{to_email}}`.
+
+Variables envoyées (mêmes valeurs dans les deux e-mails) :
 
 | Variable | Contenu |
 |---|---|
-| `name`, `from_name`, `user_name`, `to_name` | nom du client (`to_name` vaut « Maison Sensa » pour l'e-mail boutique) |
-| `email`, `from_email`, `user_email` | e-mail du client |
-| `to_email` | destinataire : le client, ou maison.sensaproject@gmail.com pour la boutique |
-| `reply_to` | adresse de réponse : Maison Sensa pour le client, le client pour la boutique |
-| `title`, `subject` | objet de l'e-mail |
-| `message` | **récapitulatif complet** en texte : introduction, référence, détails, total, téléphone, message du client |
-| `time` | date et heure de l'envoi (heure de Paris) |
-| `phone` | téléphone du client (si fourni) |
+| `to_email` | e-mail du client (destinataire du template client, adresse de réponse du template boutique) |
+| `reply_to` | maison.sensaproject@gmail.com pour le client, e-mail du client pour la boutique |
+| `to_name`, `client_name` | nom du client |
+| `reference` | référence de la réservation, numéro de commande ou de message |
+| `formula` | « Atelier Signature · parfum 50 ml · 149 € » (réservation), « Commande en ligne », « Message depuis le site » |
+| `date_label`, `time_label` | date et heure du créneau (réservation) ou de l'envoi |
+| `client_phone`, `client_email` | coordonnées du client |
+| `message` | récapitulatif complet en texte (détails, total, message du client) |
+| `message_client` | message libre écrit par le client |
 
-Variables supplémentaires disponibles si un template les utilise : `type`, `titre`, `intro`, `reference`, `details_texte`, `details_html` (à insérer avec `{{{details_html}}}`), `total`, `client_nom`, `client_email`, `client_telephone`, `message_client`, `boutique_adresse`, `boutique_email`.
+Variables supplémentaires disponibles : `subject`, `title`, `time`, `name`, `email`, `total`, `details_texte`, `details_html` (avec `{{{details_html}}}`), `boutique_adresse`, `boutique_email`.
 
 **Au moment de la mise en ligne :** ajoutez le domaine du site dans les domaines autorisés d'EmailJS (Account → Security), et les 5 variables dans Vercel ou Netlify (voir plus haut).
 

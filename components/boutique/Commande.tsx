@@ -58,9 +58,9 @@ export function Commande() {
             {v.mode === "retrait" ? `retrait en boutique, ${adresseComplete()}` : `livraison à ${v.adresse}, ${v.cp} ${v.ville}`}
           </p>
           <p className="mt-6">
-            {fin.email === false
-              ? "Votre commande est bien enregistrée. L’e-mail de confirmation n’a pas pu partir : notez votre numéro de commande."
-              : "Vous recevrez une confirmation par e-mail."}
+            {fin.email === true
+              ? "Vous recevrez une confirmation par e-mail."
+              : "Votre commande est bien enregistrée : notez votre numéro de commande. Maison Sensa revient vers vous par e-mail pour la suite."}
           </p>
           <LienBouton href="/" variante="lien" fleche className="mt-8">
             Retour à l’accueil

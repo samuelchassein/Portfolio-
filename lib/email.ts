@@ -5,9 +5,15 @@
  * Chaque action envoie deux e-mails avec le même jeu de variables :
  *  - au client (template CLIENT) ;
  *  - à Maison Sensa (template BOUTIQUE).
- * Les templates sont ceux déjà configurés dans le compte EmailJS : on envoie
- * donc aussi les noms de variables usuels d'EmailJS (name, email, title,
- * message, time, from_name…), et `message` contient le récapitulatif complet.
+ * Les templates sont ceux déjà configurés dans le compte EmailJS (conçus pour
+ * les demandes d'atelier) :
+ *  - CLIENT : To = {{to_email}}, Reply To = {{reply_to}} ; {{to_name}},
+ *    {{formula}}, {{date_label}}, {{time_label}}…
+ *  - BOUTIQUE : To = adresse de la boutique, Reply To = {{to_email}} ;
+ *    {{client_name}}, {{reference}}, {{formula}}, {{date_label}}, {{time_label}}…
+ * Donc `to_email` vaut toujours l'e-mail du client. Le template client parlant
+ * d'atelier, il n'est envoyé que pour les réservations ; commandes et messages
+ * n'envoient que la notification boutique (qui répond au client).
  * Si une variable manque, rien n'est envoyé, le parcours reste confirmé à
  * l'écran et un avertissement s'affiche en console de développement.
  */
@@ -52,10 +58,16 @@ export interface VariablesEmail {
   user_email: string;
   phone: string;
   message_client: string;
+  client_name: string;
+  client_phone: string;
+  formula: string;
+  date_label: string;
+  time_label: string;
 }
 
 export interface ResultatEnvoi {
-  client: boolean;
+  /** null : pas d'e-mail client prévu pour cette action. */
+  client: boolean | null;
   boutique: boolean;
   configure: boolean;
 }
@@ -88,6 +100,10 @@ interface Envoi {
   lignes: [string, string][];
   total?: string;
   message?: string;
+  /** Formule et créneau, pour les variables {{formula}}, {{date_label}}, {{time_label}}. */
+  formule?: string;
+  dateLabel?: string;
+  heureLabel?: string;
 }
 
 export async function envoyerEmails(e: Envoi): Promise<ResultatEnvoi> {
@@ -105,7 +121,16 @@ export async function envoyerEmails(e: Envoi): Promise<ResultatEnvoi> {
     [intro, e.reference && !aLibelle("Référence") ? `Référence : ${e.reference}` : "", detailsTexte(lignesTotal), e.client.telephone ? `Téléphone : ${e.client.telephone}` : "", e.message ? `Message :\n${e.message}` : ""]
       .filter(Boolean)
       .join("\n\n");
+  const maintenant = new Date();
+  const fr = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("fr-FR", { ...o, timeZone: "Europe/Paris" }).format(maintenant);
+  const formuleParDefaut = e.type === "commande" ? "Commande en ligne" : "Message depuis le site";
   const commun = {
+    client_name: e.client.nom,
+    client_phone: e.client.telephone ?? "",
+    formula: e.formule ?? formuleParDefaut,
+    date_label: e.dateLabel ?? fr({ day: "numeric", month: "long", year: "numeric" }),
+    time_label: e.heureLabel ?? fr({ hour: "2-digit", minute: "2-digit" }),
+    to_email: e.client.email,
     name: e.client.nom,
     email: e.client.email,
     from_name: e.client.nom,
@@ -128,7 +153,6 @@ export async function envoyerEmails(e: Envoi): Promise<ResultatEnvoi> {
   };
   const pourClient: VariablesEmail = {
     ...commun,
-    to_email: e.client.email,
     to_name: e.client.nom,
     reply_to: SITE.email,
     subject: e.sujetClient,
@@ -139,8 +163,7 @@ export async function envoyerEmails(e: Envoi): Promise<ResultatEnvoi> {
   };
   const pourBoutique: VariablesEmail = {
     ...commun,
-    to_email: SITE.email,
-    to_name: "Maison Sensa",
+    to_name: e.client.nom,
     reply_to: e.client.email,
     subject: e.sujetBoutique,
     title: e.sujetBoutique,
@@ -149,12 +172,13 @@ export async function envoyerEmails(e: Envoi): Promise<ResultatEnvoi> {
     message: recap(e.introBoutique),
   };
   const options = { publicKey: CONFIG.cle! };
+  const avecClient = e.type === "reservation";
   const [rc, rb] = await Promise.allSettled([
-    emailjs.send(CONFIG.service!, CONFIG.client!, { ...pourClient }, options),
+    avecClient ? emailjs.send(CONFIG.service!, CONFIG.client!, { ...pourClient }, options) : Promise.resolve(null),
     emailjs.send(CONFIG.service!, CONFIG.boutique!, { ...pourBoutique }, options),
   ]);
   // Un échec partiel ne bloque jamais le parcours : il est journalisé.
-  if (rc.status === "rejected") console.error("[Maison Sensa] E-mail client non envoyé", rc.reason);
+  if (avecClient && rc.status === "rejected") console.error("[Maison Sensa] E-mail client non envoyé", rc.reason);
   if (rb.status === "rejected") console.error("[Maison Sensa] Notification boutique non envoyée", rb.reason);
-  return { client: rc.status === "fulfilled", boutique: rb.status === "fulfilled", configure: true };
+  return { client: avecClient ? rc.status === "fulfilled" : null, boutique: rb.status === "fulfilled", configure: true };
 }
