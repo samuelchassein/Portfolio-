@@ -7,7 +7,7 @@ Brief : `kit/PROMPT_CLAUDE_CODE.md` · Plan et décisions : `PLAN.md` · Branche
 
 - **Plan** validé (`PLAN.md`) : direction « Galerie minérale », Cormorant Garamond + Jost.
 - **3D** (`components/three/`) : flacon calibré sur la photo (`docs/calibration/`), bougie, format voyage, coffret ; GLB dans `public/models/`.
-- **Rendus Blender** (`scripts/blender/rendu.py`, `produire.sh` reprenable) : flacon 5 vues HD faites (`public/renders/flacon-*.png|webp`). Reste : 360° (36 vues × 4), scène gamme, 3 vues × 3 produits, scènes boutique. Conversion : `node scripts/convertir-rendus.mjs`.
+- **Rendus Blender** (`scripts/blender/rendu.py`, `produire.sh` reprenable) : fait pour flacon (5 vues), bougie, format voyage, coffret (3 vues chacun), 360° des 4 produits, scène gamme, scènes boutique flacon et gamme. Reste : scènes boutique bougie, format voyage, coffret (relancer `produire.sh`, il saute l’existant). Conversion : `node scripts/convertir-rendus.mjs`.
 - **Images** : agrandies ×2 (`assets-src/x2/` → `public/images/`), recadrages d'affiches (`public/images/produits/`), mur des familles recadré et étiquettes floutées (`mur-familles-haut.jpg`).
 - **Design system** validé : `app/globals.css` (tokens), `components/brand/*`, `components/ui/*`, page `/styleguide`.
 - **Habillage** : `app/(site)/layout.tsx` (en-tête, pied, tiroir panier, Lenis).
