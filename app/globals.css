@@ -46,8 +46,11 @@
   /* Échelle typographique : titres héros 64–120 px sur desktop. */
   --text-hero: clamp(3rem, 1.6rem + 6vw, 7.5rem);
   --text-hero--line-height: 0.98;
+  /* Grands titres : approche resserrée, sinon le serif paraît lâche en grand corps. */
+  --text-hero--letter-spacing: -0.02em;
   --text-titre: clamp(2.25rem, 1.5rem + 3vw, 4.5rem);
   --text-titre--line-height: 1.04;
+  --text-titre--letter-spacing: -0.015em;
   --text-sous-titre: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
   --text-sous-titre--line-height: 1.2;
   --text-surtitre: 0.75rem;
@@ -56,9 +59,57 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* Pas de flash gris/bleu au toucher : chaque contrôle a son propre état :active. */
+  -webkit-tap-highlight-color: transparent;
   /* Jamais de défilement horizontal de page ; « clip » préserve les scènes collantes. */
   overflow-x: clip;
   text-rendering: optimizeLegibility;
+}
+
+/*
+ * Redimensionnement sur grands écrans : tout le système est en rem (espacements Tailwind,
+ * conteneur max-w-[90rem], typographie). Au-delà de 1 680 px, la taille racine suit la
+ * largeur de la fenêtre, plafonnée à 20 px : la page garde ses proportions sur un écran
+ * 1 920 ou 2 560 px au lieu d'y flotter en petit au centre. En dessous, rien ne change.
+ */
+@media (min-width: 1680px) {
+  html {
+    font-size: min(calc(100vw / 105), 20px);
+  }
+}
+
+/*
+ * Base « mobile native » (Emil Kowalski, skill mobile-native).
+ * - touch-action: manipulation supprime l'attente de double-tap sur les contrôles ;
+ * - les libellés de contrôles ne se sélectionnent pas à l'appui long (le contenu, si) ;
+ * - iOS zoome sur un champ de moins de 16 px et ne dézoome pas : 16 px minimum au doigt.
+ */
+:where(a, button, summary, label, [role="button"]) {
+  touch-action: manipulation;
+}
+:where(button, [role="button"], summary) {
+  -webkit-user-select: none;
+  user-select: none;
+}
+@media (pointer: coarse) {
+  :where(input:not([type="checkbox"], [type="radio"], [type="range"]), textarea, select) {
+    font-size: max(1em, 16px);
+  }
+}
+
+/*
+ * Retour à l'appui : le bouton répond dès que le doigt se pose (scale 0.97, ease-out court),
+ * pas au relâchement. Les couleurs gardent leur fondu de 300 ms.
+ */
+.appui {
+  transition:
+    background-color 300ms var(--ease-sortie),
+    color 300ms var(--ease-sortie),
+    border-color 300ms var(--ease-sortie),
+    transform 160ms var(--ease-sortie);
+}
+.appui:active:not(:disabled, [aria-disabled="true"]) {
+  transform: scale(0.97);
 }
 
 body {

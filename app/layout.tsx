@@ -12,7 +12,17 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-export const viewport: Viewport = { themeColor: "#F6EDDD" };
+/**
+ * viewportFit « cover » : le fond passe sous l'encoche, le contenu est repoussé par env(safe-area-inset-*).
+ * interactiveWidget : le clavier Android réduit la mise en page, comme sur iOS (dvh et éléments fixés en bas).
+ * Le zoom reste autorisé (pas de maximumScale).
+ */
+export const viewport: Viewport = {
+  themeColor: "#F6EDDD",
+  colorScheme: "light",
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
+};
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

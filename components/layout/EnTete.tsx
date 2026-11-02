@@ -35,7 +35,7 @@ export function EnTete() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-500 ease-sortie ${
+      className={`fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] transition-[background-color,box-shadow,backdrop-filter] duration-500 ease-sortie ${
         defile ? "bg-ivoire/88 shadow-[0_1px_0_rgb(28_26_23/0.08)] backdrop-blur-md" : "bg-ivoire/88 backdrop-blur-md md:bg-transparent md:backdrop-blur-none"
       }`}
     >
@@ -76,7 +76,7 @@ export function EnTete() {
         <div className="flex items-center gap-1 sm:gap-3">
           <Link
             href="/atelier#reserver"
-            className="inline-flex min-h-11 items-center bg-vert px-4 text-[0.72rem] uppercase tracking-[0.22em] text-ivoire-clair transition-colors duration-300 hover:bg-vert-nuit sm:px-6"
+            className="appui inline-flex min-h-11 items-center bg-vert px-4 text-[0.72rem] uppercase tracking-[0.22em] text-ivoire-clair hover:bg-vert-nuit sm:px-6"
           >
             Réserver
           </Link>
@@ -93,7 +93,7 @@ export function EnTete() {
             {n > 0 && (
               <span
                 aria-hidden="true"
-                className="absolute right-0.5 top-1 flex min-w-4 items-center justify-center rounded-full bg-dore px-1 text-[0.625rem] leading-4 text-encre"
+                className="absolute right-0.5 top-1 flex min-w-4 items-center justify-center rounded-full bg-dore px-1 text-[0.625rem] leading-4 tabular-nums text-encre"
               >
                 {n}
               </span>
@@ -118,7 +118,7 @@ export function EnTete() {
         aria-label="Menu"
         className="m-0 h-dvh max-h-none w-full max-w-none bg-ivoire p-0 text-encre backdrop:bg-encre/30 open:flex open:flex-col"
       >
-        <div className="flex h-16 items-center justify-between px-4 sm:px-8">
+        <div className="flex h-16 items-center justify-between px-4 pt-[env(safe-area-inset-top)] sm:px-8 box-content">
           <Wordmark decoratif className="w-[7.5rem]" />
           <button
             type="button"

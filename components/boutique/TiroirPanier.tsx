@@ -69,7 +69,7 @@ export function TiroirPanier() {
             aria-labelledby="titre-panier"
             tabIndex={-1}
             onKeyDown={pieger}
-            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-ivoire-clair shadow-2xl outline-none"
+            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-ivoire-clair pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] shadow-2xl outline-none"
             initial={{ x: reduit ? 0 : "100%", opacity: reduit ? 0 : 1 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: reduit ? 0 : "100%", opacity: reduit ? 0 : 1 }}
@@ -100,7 +100,7 @@ export function TiroirPanier() {
               </div>
             ) : (
               <>
-                <ul className="flex-1 divide-y divide-encre/10 overflow-y-auto px-6" aria-live="polite">
+                <ul className="flex-1 divide-y divide-encre/10 overflow-y-auto overscroll-contain px-6" aria-live="polite">
                   {lignes.map((l) => {
                     const p = produitParSlug(l.slug);
                     const { unitaire, total: tl, prixAtelier } = prixLigne(l, lignes);

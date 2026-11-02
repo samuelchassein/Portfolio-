@@ -14,6 +14,8 @@ Brief : `kit/PROMPT_CLAUDE_CODE.md` · Plan et décisions : `PLAN.md` · Branche
 - **Accueil** : scènes 0 à 8 (`components/scenes/*`), versions sans animation. Choix : tour complet du flacon par famille (étiquette lisible à chaque famille).
 - **Contenus** : `content/site.ts`, `familles.ts`, `produits.ts`. Panier : `stores/panier.ts` (règle bougie 45 € avec atelier).
 
+- **Redimensionnement** (skills `mobile-native` et `emil-design-eng` d’Emil Kowalski, dans `.claude/skills/`) : au-delà de 1 680 px la taille racine suit la fenêtre (max 20 px), viewport `viewport-fit=cover` + `interactive-widget=resizes-content`, encoche et barre d’accueil (`env(safe-area-inset-*)`) sur l’en-tête, le menu, le panier et le bandeau cookies, pas de flash au toucher, champs à 16 px minimum au doigt, appui `scale(0.97)` (classe `.appui`), approche resserrée des grands titres. Audit 320 → 1 920 px : aucun débordement horizontal.
+
 ## Reste (ordre de priorité)
 
 1. ~~`/atelier`, réservation, notice README~~ fait.
