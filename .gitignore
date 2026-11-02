@@ -1,0 +1,14 @@
+.env.local
+.env*.local
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+__pycache__/
+.next-studio/
+.next-studio2/
+tmp-360/
+.next-prod/
+.netlify
+deploy-*.zip

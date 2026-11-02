@@ -1,0 +1,234 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Maison Sensa — design system
+   Palette échantillonnée sur le moodboard ; une seule source de vérité.
+   ------------------------------------------------------------------ */
+:root {
+  --ivoire: #f6eddd;
+  --ivoire-clair: #fbf6ee;
+  --travertin: #e8dcc8;
+  --vert-profond: #1f3a2e;
+  --vert-nuit: #142820;
+  --dore: #c9a26a;
+  --dore-clair: #d4ac70;
+  /* Doré foncé : seule teinte dorée lisible en petit texte (5,3:1 sur ivoire, 4,5:1 sur travertin). */
+  --dore-texte: #7a5d2c;
+  --noyer: #64371b;
+  --encre: #1c1a17;
+  --encre-douce: #5b544a;
+  --erreur: #9b2c1f;
+
+  --ease-doux: cubic-bezier(0.22, 1, 0.36, 1); /* expo.out */
+  --ease-sortie: cubic-bezier(0.33, 1, 0.68, 1); /* power2.out */
+}
+
+@theme inline {
+  --color-ivoire: var(--ivoire);
+  --color-ivoire-clair: var(--ivoire-clair);
+  --color-travertin: var(--travertin);
+  --color-vert: var(--vert-profond);
+  --color-vert-nuit: var(--vert-nuit);
+  --color-dore: var(--dore);
+  --color-dore-clair: var(--dore-clair);
+  --color-dore-texte: var(--dore-texte);
+  --color-noyer: var(--noyer);
+  --color-encre: var(--encre);
+  --color-encre-douce: var(--encre-douce);
+  --color-erreur: var(--erreur);
+
+  --font-serif: var(--police-serif), "Cormorant Garamond", Garamond, serif;
+  --font-sans: var(--police-sans), Jost, "Helvetica Neue", Arial, sans-serif;
+
+  --ease-doux: var(--ease-doux);
+  --ease-sortie: var(--ease-sortie);
+
+  /* Échelle typographique : titres héros 64–120 px sur desktop. */
+  --text-hero: clamp(3rem, 1.6rem + 6vw, 7.5rem);
+  --text-hero--line-height: 0.98;
+  /* Grands titres : approche resserrée, sinon le serif paraît lâche en grand corps. */
+  --text-hero--letter-spacing: -0.02em;
+  --text-titre: clamp(2.25rem, 1.5rem + 3vw, 4.5rem);
+  --text-titre--line-height: 1.04;
+  --text-titre--letter-spacing: -0.015em;
+  --text-sous-titre: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+  --text-sous-titre--line-height: 1.2;
+  --text-surtitre: 0.75rem;
+  --text-surtitre--line-height: 1.4;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Pas de flash gris/bleu au toucher : chaque contrôle a son propre état :active. */
+  -webkit-tap-highlight-color: transparent;
+  /* Jamais de défilement horizontal de page ; « clip » préserve les scènes collantes. */
+  overflow-x: clip;
+  text-rendering: optimizeLegibility;
+}
+
+/*
+ * Redimensionnement sur grands écrans : tout le système est en rem (espacements Tailwind,
+ * conteneur max-w-[90rem], typographie). Au-delà de 1 680 px, la taille racine suit la
+ * largeur de la fenêtre, plafonnée à 20 px : la page garde ses proportions sur un écran
+ * 1 920 ou 2 560 px au lieu d'y flotter en petit au centre. En dessous, rien ne change.
+ */
+@media (min-width: 1680px) {
+  html {
+    font-size: min(calc(100vw / 105), 20px);
+  }
+}
+
+/*
+ * Base « mobile native » (Emil Kowalski, skill mobile-native).
+ * - touch-action: manipulation supprime l'attente de double-tap sur les contrôles ;
+ * - les libellés de contrôles ne se sélectionnent pas à l'appui long (le contenu, si) ;
+ * - iOS zoome sur un champ de moins de 16 px et ne dézoome pas : 16 px minimum au doigt.
+ */
+:where(a, button, summary, label, [role="button"]) {
+  touch-action: manipulation;
+}
+:where(button, [role="button"], summary) {
+  -webkit-user-select: none;
+  user-select: none;
+}
+@media (pointer: coarse) {
+  :where(input:not([type="checkbox"], [type="radio"], [type="range"]), textarea, select) {
+    font-size: max(1em, 16px);
+  }
+}
+
+/*
+ * Retour à l'appui : le bouton répond dès que le doigt se pose (scale 0.97, ease-out court),
+ * pas au relâchement. Les couleurs gardent leur fondu de 300 ms.
+ */
+.appui {
+  transition:
+    background-color 300ms var(--ease-sortie),
+    color 300ms var(--ease-sortie),
+    border-color 300ms var(--ease-sortie),
+    transform 160ms var(--ease-sortie);
+}
+.appui:active:not(:disabled, [aria-disabled="true"]) {
+  transform: scale(0.97);
+}
+
+body {
+  /* Grain papier très léger sur toute la page. */
+  background: var(--ivoire) url("/textures/grain.png") repeat;
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
+  color: var(--encre);
+  font-family: var(--police-sans), Jost, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+
+/* Grain papier très léger sur les grands aplats ivoire. */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("/textures/grain.png");
+  background-size: 256px 256px;
+  mix-blend-mode: multiply;
+}
+
+/* Chiffres alignés dans le serif (prix « 149 € », compteurs « 01 / 04 »). */
+.font-serif {
+  font-variant-numeric: lining-nums;
+}
+
+/* Focus visible : anneau doré doublé d'un contour encre pour garder le contraste. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--dore);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--encre) 35%, transparent);
+  border-radius: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--dore) 45%, transparent);
+  color: var(--encre);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Ombres de feuillage : balancement lent (désactivé par prefers-reduced-motion). */
+@keyframes balancement-feuillage {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(1.2%, 0.8%, 0) rotate(1.4deg);
+  }
+}
+.ombres-feuillage {
+  animation: balancement-feuillage 9s ease-in-out infinite;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* Indicateur « Défiler pour entrer ». */
+@keyframes respiration-trait {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+.trait-defiler {
+  animation: respiration-trait 2.4s var(--ease-doux) infinite;
+}
+
+/* Bouton circulaire qui pulse doucement (visite 360°). */
+@keyframes pulsation {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+.pulsation::before,
+.pulsation::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1px solid var(--dore-clair);
+  animation: pulsation 2.8s var(--ease-sortie) infinite;
+}
+.pulsation::after {
+  animation-delay: 1.4s;
+}

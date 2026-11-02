@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Maison Sensa — Showreel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body { margin: 0; background: #0b0b0b; overflow: hidden; }
+  #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: #0E1A14; }
+  .L { position: absolute; inset: 0; }
+  .abs { position: absolute; white-space: nowrap; }
+  .serif { font-family: "Corm", serif; font-weight: 600; }
+  .serifm { font-family: "Corm", serif; font-weight: 500; }
+  .ital { font-family: "CormI", serif; font-style: italic; font-weight: 500; }
+  .sans { font-family: "Jost", sans-serif; }
+  .mask { position: absolute; overflow: hidden; white-space: nowrap; }
+  .mask > span { display: inline-block; }
+  img { display: block; }
+  #controls { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 12px; align-items: center; padding: 10px 16px; background: #111; color: #ddd; font: 13px/1 system-ui, sans-serif; }
+  #controls button { background: #C9A26A; border: 0; color: #111; padding: 8px 14px; cursor: pointer; font-weight: 600; }
+  #controls input { flex: 1; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script src="assets.js"></script>
+<script>
+/* ============================================================================
+   MAISON SENSA — SHOWREEL 30 s · 128 BPM · 16 mesures · 1920 × 1080
+   B = 0,469 s (temps) · mesure = 1,875 s
+   Feuille de temps (temps → image → son)
+   0,00  S1 Ouverture : nuit verte, grille, étincelle dorée qui bat ............ pad, pulsation sub
+   1,88  l'étincelle s'étire en ligne + libellé tapé ................................ montée (riser)
+   2,81  la ligne ondule une fois ..................................................... whoosh
+   3,28  la ligne s'ouvre verticalement en aplat ivoire ............................. riser → impact
+   3,75  S2 Identité : kicker, MAISON, lettres SENSA masquées à la double croche ..... impact, kick, ticks
+   5,16  ligne italique « Votre identité, votre signature olfactive. » .............. blip
+   6,56  le point doré se détache, rejoint le centre, grandit en aplat vert ......... whoosh
+   7,50  S3 SENTIR (ivoire sur vert, motif en contour) ............................... impact, blip
+   8,44  CRÉER (vert sur or) ............................................................. blip
+   9,38  EXPLORER (ivoire sur photo, cadre de viseur) .................................. blip
+  10,31  partager (italique qui s'écrit) puis le soulignement inonde ................... blip, whoosh
+  11,25  S4 Familles : flacon (rendus Blender 360°), Frais ............................. impact, whoosh
+  12,66  Floral (cercle d'ambiance depuis le flacon, particules en anneau) ............ whoosh
+  14,06  Boisé ............................................................................. whoosh
+  15,47  Ambré ; 16,40 barre verte qui balaie ............................................ whoosh
+  16,88  S5 Produit : carte de réservation en 3D, curseur, créneau, envoi ............. impact, clics
+  20,86  « Demande envoyée ✓ » + toast ; 21,80 la pastille dorée grandit en aplat ivoire  carillon, whoosh
+  22,50  S6 La gamme : 4 rendus Blender tombent sur le temps .......................... 4 chocs
+  24,38  S7 Visite : arches photo qui montent, titre italique .......................... whoosh
+  25,78  tout se replie en un point, cercle vert ......................................... riser
+  26,25  S8 Signature : point doré, onde, wordmark, filet, URL tapée, tenue .......... impact, cloche
+  30,00  fin
+   ========================================================================== */
+const W = 1920, H = 1080, DUR = 30, BPM = 128, B = 60 / BPM, BAR = 4 * B;
+window.VIDEO = { w: W, h: H, duration: DUR };
+const RENDER = location.search.includes("render");
+
+/* ---------- helpers ---------- */
+function spring(t, w = 14, z = 0.82) {
+  if (t <= 0) return 0;
+  if (z >= 1) return 1 - Math.exp(-w * t) * (1 + w * t);
+  const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t));
+}
+const track = (v0, keys) => t => { let v = v0, p = v0; for (const [tk, val, w, z] of keys) { v += (val - p) * spring(t - tk, w, z); p = val; } return v; };
+const kf = keys => t => { if (t <= keys[0][0]) return keys[0][1]; for (let i = 1; i < keys.length; i++) { const [a, va] = keys[i - 1], [b, vb, e = ease] = keys[i]; if (t <= b) return lerp(va, vb, e((t - a) / (b - a))); } return keys[keys.length - 1][1]; };
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const ease = x => (x = clamp(x), x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const eOut = x => (x = clamp(x), 1 - Math.pow(1 - x, 3));
+const eIn = x => (x = clamp(x), x * x * x);
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const rng = s => () => (s = (s + 0x6D2B79F5) | 0, s = Math.imul(s ^ (s >>> 15), 1 | s), s ^= s + Math.imul(s ^ (s >>> 7), 61 | s), ((s ^ (s >>> 14)) >>> 0) / 4294967296);
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const mix = (a, b, k) => { const A = hex(a), Bc = hex(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, Bc[i], clamp(k)))).join(",")})`; };
+
+/* ---------- palette & contenus réels du site ---------- */
+const C = { night: "#0E1A14", green: "#1F3A2E", deep: "#142820", ivory: "#F6EDDD", ivl: "#FBF6EE", trav: "#E8DCC8", gold: "#C9A26A", goldT: "#7A5D2C", ink: "#1C1A17" };
+const FAM = [
+  { nom: "Frais", notes: ["Bergamote", "Feuille de figuier", "Menthe poivrée"], evo: "La lumière du matin sur un jardin encore humide.", amb: ["#EEF0DC", "#D9E2C2"], encre: "#1F3A2E", jus: "#B58F2E" },
+  { nom: "Floral", notes: ["Jasmin", "Rose", "Iris poudré"], evo: "Un bouquet de fleurs blanches près d’une fenêtre.", amb: ["#F8EEE6", "#EFDCD2"], encre: "#3A2A24", jus: "#C08A4A" },
+  { nom: "Boisé", notes: ["Cèdre", "Santal", "Vétiver"], evo: "Un sous-bois à l’heure où la lumière devient oblique.", amb: ["#E3DACA", "#B9A88C"], encre: "#1F3A2E", jus: "#8C6A3A" },
+  { nom: "Ambré", notes: ["Vanille", "Benjoin", "Cardamome"], evo: "La chaleur dorée d’une fin d’après-midi.", amb: ["#F2DFBF", "#DDB97E"], encre: "#3A2414", jus: "#A8681F" },
+];
+const T = { s1: 0, s2: 8 * B, s3: 16 * B, s4: 24 * B, s5: 36 * B, s6: 48 * B, s7: 52 * B, s8: 56 * B };
+const FAMDUR = 3 * B;
+
+/* ---------- polices embarquées ---------- */
+for (const [fam, src, w, st] of [["Corm", A.fonts.corm500, 500, "normal"], ["Corm", A.fonts.corm600, 600, "normal"], ["CormI", A.fonts.corm500i, 500, "italic"], ["Jost", A.fonts.jost300, 300, "normal"], ["Jost", A.fonts.jost400, 400, "normal"], ["Jost", A.fonts.jost500, 500, "normal"]]) {
+  const f = new FontFace(fam, `url(${src})`, { weight: String(w), style: st }); document.fonts.add(f); f.load();
+}
+
+/* ---------- construction du DOM ---------- */
+const stage = document.getElementById("stage");
+function el(parent, cls = "", html = "", css = {}) { const e = document.createElement("div"); if (cls) e.className = cls; if (html) e.innerHTML = html; Object.assign(e.style, css); parent.appendChild(e); return e; }
+function img(parent, src, css = {}) { const e = document.createElement("img"); e.src = src; Object.assign(e.style, css); parent.appendChild(e); return e; }
+const tr = (e, s) => { e.style.transform = s; };
+const op = (e, o) => { e.style.opacity = o; };
+const vis = (e, on) => { e.style.display = on ? "" : "none"; };
+/** Texte en lettres masquées : renvoie le conteneur et la liste des lettres. */
+function lettres(parent, texte, cls, css) {
+  const box = el(parent, "abs", "", css);
+  const L = [...texte].map(ch => { const m = el(box, "", "", { display: "inline-block", overflow: "hidden", verticalAlign: "top", lineHeight: "1.05", paddingBottom: ".04em" }); const s = el(m, cls, ch === " " ? "&nbsp;" : ch, { display: "inline-block" }); return s; });
+  return { box, L };
+}
+
+/* S1 — ouverture */
+const s1 = el(stage, "L");
+const s1grid = el(s1, "L", "", { backgroundImage: "linear-gradient(rgba(201,162,106,.09) 1px, transparent 1px), linear-gradient(90deg, rgba(201,162,106,.09) 1px, transparent 1px)", backgroundSize: "96px 96px", backgroundPosition: "center" });
+const s1line = el(s1, "abs", "", { left: 0, top: 0, background: C.gold });
+const s1spark = el(s1, "abs", "", { width: "16px", height: "16px", borderRadius: "50%", background: C.gold, boxShadow: "0 0 24px 6px rgba(201,162,106,.55)", left: W / 2 - 8 + "px", top: H / 2 - 8 + "px" });
+const s1lab = el(s1, "abs sans", "", { left: "0", width: W + "px", textAlign: "center", top: H / 2 + 34 + "px", color: "rgba(246,237,221,.7)", fontSize: "17px", letterSpacing: ".42em", fontWeight: 400 });
+const S1LAB = "MAISON SENSA  /  PARFUMERIE & ATELIER — 2026";
+
+/* S2 — identité */
+const s2 = el(stage, "L");
+const s2cam = el(s2, "L", "", { transformOrigin: "50% 50%" });
+const s2kick = el(s2cam, "abs sans", "", { left: 0, width: W + "px", textAlign: "center", top: "268px", color: C.goldT, fontSize: "19px", letterSpacing: ".5em", fontWeight: 500 });
+const S2KICK = "PARFUMERIE  ·  ATELIER DE CRÉATION OLFACTIVE";
+const s2rule = el(s2cam, "abs", "", { left: W / 2 + "px", top: "318px", height: "1px", background: C.gold });
+const s2maison = lettres(s2cam, "MAISON", "sans", { left: "0", width: W + "px", textAlign: "center", top: "350px", fontSize: "44px", letterSpacing: ".95em", color: C.ink, fontFamily: "Jost", fontWeight: 400, textIndent: ".95em" });
+const s2sensa = lettres(s2cam, "SENSA", "serif", { left: "0", width: W + "px", textAlign: "center", top: "392px", fontSize: "330px", letterSpacing: ".06em", color: C.green });
+const s2tag = el(s2cam, "mask", "<span class='ital'>Votre identité, votre signature olfactive.</span>", { left: "0", width: W + "px", textAlign: "center", top: "776px", fontSize: "58px", color: C.green });
+const s2dot = el(s2, "abs", "", { width: "30px", height: "30px", borderRadius: "50%", background: C.gold, left: "0", top: "0" });
+
+/* S3 — typographie cinétique */
+const s3 = el(stage, "L");
+const w1 = el(s3, "L"), w2 = el(s3, "L"), w3 = el(s3, "L"), w4 = el(s3, "L");
+const w1rows = [0, 1, 2, 3, 4, 5].map(i => el(w1, "abs serif", Array(8).fill("SENTIR").join("  ·  "), { left: "0", top: -60 + i * 200 + "px", fontSize: "170px", color: "transparent", webkitTextStroke: "1.4px rgba(201,162,106,.38)", letterSpacing: ".04em" }));
+const w1word = el(w1, "abs serif", "SENTIR", { left: "0", width: W + "px", textAlign: "center", top: "330px", fontSize: "330px", color: C.ivory, letterSpacing: ".05em" });
+const w1cap = el(w1, "abs ital", "on y sent, on y teste, on y touche", { left: 0, width: W + "px", textAlign: "center", top: "760px", fontSize: "48px", color: C.gold });
+const w2word = el(w2, "abs serif", "CRÉER", { left: "0", width: W + "px", textAlign: "center", top: "300px", fontSize: "360px", color: C.green, letterSpacing: ".05em" });
+const w2cap = el(w2, "abs ital", "votre parfum, avec un conseiller", { left: 0, width: W + "px", textAlign: "center", top: "780px", fontSize: "50px", color: C.deep });
+const w3photo = img(w3, A.photo.interieur, { position: "absolute", left: "0", top: "0", width: W + "px", height: H + "px", objectFit: "cover", transformOrigin: "50% 50%" });
+el(w3, "L", "", { background: "rgba(14,26,20,.5)" });
+const w3word = el(w3, "abs serif", "EXPLORER", { left: "0", width: W + "px", textAlign: "center", top: "360px", fontSize: "250px", color: C.ivory, letterSpacing: ".06em", transformOrigin: "50% 60%" });
+const w3br = [0, 1, 2, 3].map(i => el(w3, "abs", "", { width: "64px", height: "64px", borderColor: C.ivory, borderStyle: "solid", borderWidth: ["3px 0 0 3px", "3px 3px 0 0", "0 0 3px 3px", "0 3px 3px 0"][i] }));
+const w3lab = el(w3, "abs sans", "VISITE 360°  ·  REC", { fontSize: "16px", letterSpacing: ".4em", color: C.ivory, fontWeight: 500 });
+const w3lab2 = el(w3, "abs sans", "1920 × 1080", { fontSize: "16px", letterSpacing: ".3em", color: "rgba(246,237,221,.8)" });
+const w4kick = el(w4, "abs sans", "SENTIR  ·  CRÉER  ·  EXPLORER  ·  PARTAGER", { left: 0, width: W + "px", textAlign: "center", top: "300px", fontSize: "18px", letterSpacing: ".5em", color: C.goldT, fontWeight: 500 });
+const w4word = el(w4, "abs ital", "partager", { left: "0", width: W + "px", textAlign: "center", top: "330px", fontSize: "300px", color: C.green });
+const w4pen = el(w4, "abs", "", { width: "18px", height: "18px", borderRadius: "50%", background: C.gold, boxShadow: "0 0 18px 4px rgba(201,162,106,.5)" });
+const w4bar = el(w4, "abs", "", { background: C.gold });
+
+/* S4 — familles olfactives + flacon 360° */
+const s4 = el(stage, "L");
+const s4prev = el(s4, "L"), s4cur = el(s4, "L");
+const fx = document.createElement("canvas"); fx.width = W; fx.height = H; Object.assign(fx.style, { position: "absolute", left: 0, top: 0 }); s4.appendChild(fx);
+const fctx = fx.getContext("2d");
+const s4cam = el(s4, "L", "", { transformOrigin: "50% 55%" });
+const s4kick = el(s4cam, "abs sans", "", { left: "150px", top: "300px", fontSize: "18px", letterSpacing: ".45em", fontWeight: 500 });
+const s4names = FAM.map(f => lettres(s4cam, f.nom.toUpperCase(), "serif", { left: "140px", top: "370px", fontSize: "148px", letterSpacing: ".03em", color: f.encre }));
+const s4evo = el(s4cam, "mask", "", { left: "150px", top: "560px", fontSize: "38px", width: "470px", whiteSpace: "normal" });
+const s4notesLab = el(s4cam, "abs sans", "NOTES", { left: "1430px", top: "390px", fontSize: "15px", letterSpacing: ".5em", fontWeight: 500 });
+const s4notes = [0, 1, 2].map(i => el(s4cam, "mask", "", { left: "1430px", top: 432 + i * 62 + "px", fontSize: "38px", height: "56px" }));
+const s4shadow = el(s4cam, "abs", "", { left: W / 2 - 230 + "px", top: "868px", width: "460px", height: "70px", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(40,30,15,.32), rgba(40,30,15,0))" });
+const s4bottleBox = el(s4cam, "abs", "", { left: W / 2 - 300 + "px", top: "130px", width: "600px", height: "820px", webkitMaskImage: "linear-gradient(#000 84%, transparent 96%)", maskImage: "linear-gradient(#000 84%, transparent 96%)" });
+const s4frames = A.rot.map(src => img(s4bottleBox, src, { position: "absolute", left: "0", top: "0", width: "600px", height: "820px", objectFit: "contain", display: "none" }));
+const s4wipe = el(s4, "abs", "", { top: 0, height: H + "px", background: C.green, borderLeft: "8px solid " + C.gold });
+const PR = rng(7); const PARTS = Array.from({ length: 760 }, () => ({ a: PR() * Math.PI * 2, r: 360 + PR() * 560, sp: (0.18 + PR() * 0.4) * (PR() < .5 ? -1 : 1), s: 1 + PR() * 2.4, al: .25 + PR() * .6, d: PR() }));
+
+/* S5 — produit : réservation */
+const s5 = el(stage, "L", "", { background: "radial-gradient(70% 70% at 70% 50%, #2a4a3b 0%, #1F3A2E 55%, #142820 100%)" });
+const s5kick = el(s5, "abs sans", "ATELIER SIGNATURE  ·  45 À 60 MIN", { left: "150px", top: "330px", fontSize: "18px", letterSpacing: ".45em", color: C.gold, fontWeight: 500 });
+const s5t1 = el(s5, "mask", "<span class='serifm'>Réservez</span>", { left: "140px", top: "372px", fontSize: "128px", color: C.ivory, height: "150px" });
+const s5t2 = el(s5, "mask", "<span class='ital'>votre atelier.</span>", { left: "140px", top: "512px", fontSize: "128px", color: C.ivory, height: "160px" });
+const s5sub = el(s5, "abs sans", "Parfum 50 ml inclus  ·  149 €", { left: "150px", top: "700px", fontSize: "30px", color: "rgba(246,237,221,.75)", fontWeight: 300, letterSpacing: ".04em" });
+const s5persp = el(s5, "abs", "", { left: "1010px", top: "250px", width: "640px", height: "600px", perspective: "1800px" });
+const s5rig = el(s5persp, "L", "", { transformStyle: "preserve-3d" });
+const ghost = [2, 1].map(i => el(s5rig, "L", "", { background: C.ivl, opacity: i === 2 ? .18 : .35, transform: `translate3d(${i * 34}px, ${-i * 26}px, ${-i * 70}px)`, border: "1px solid rgba(201,162,106,.4)" }));
+const card = el(s5rig, "L", "", { background: C.ivl, border: "1px solid rgba(201,162,106,.55)", boxShadow: "0 60px 120px -40px rgba(0,0,0,.6)", padding: "44px 48px", boxSizing: "border-box", fontFamily: "Jost", color: C.ink });
+el(card, "sans", "NOVEMBRE 2026", { fontSize: "14px", letterSpacing: ".4em", color: C.goldT, fontWeight: 500 });
+el(card, "serifm", "Choisissez votre créneau", { fontSize: "42px", marginTop: "10px", fontWeight: 500 });
+const days = el(card, "", "", { display: "flex", gap: "10px", marginTop: "26px" });
+const DAYS = [["lun", "2", 0], ["mar", "3", 1], ["mer", "4", 1], ["jeu", "5", 1], ["ven", "6", 1], ["sam", "7", 1], ["dim", "8", 0]];
+const dayEls = DAYS.map(([d, n, o]) => el(days, "", `<div style="font-size:12px;letter-spacing:.2em;text-transform:uppercase;opacity:.6">${d}</div><div class="serifm" style="font-size:30px;margin-top:4px">${n}</div>`, { width: "66px", height: "76px", textAlign: "center", paddingTop: "8px", boxSizing: "border-box", color: o ? C.ink : "rgba(28,26,23,.25)", border: "1px solid " + (o ? "rgba(28,26,23,.12)" : "transparent") }));
+const slots = el(card, "", "", { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "26px" });
+const SLOTS = [["10 h 00", 0], ["11 h 30", 1], ["14 h 30", 1], ["16 h 00", 1]];
+const slotEls = SLOTS.map(([s, o]) => el(slots, "serifm", s, { height: "58px", lineHeight: "58px", textAlign: "center", fontSize: "26px", border: "1px solid rgba(28,26,23,.15)", color: o ? C.ink : "rgba(28,26,23,.3)", textDecoration: o ? "none" : "line-through" }));
+const btn = el(card, "sans", "", { position: "relative", marginTop: "30px", height: "66px", background: C.green, color: C.ivl, fontSize: "16px", letterSpacing: ".3em", fontWeight: 500, textAlign: "center", lineHeight: "66px", overflow: "hidden" });
+const btnFill = el(btn, "", "", { position: "absolute", left: 0, top: 0, bottom: 0, background: C.gold });
+const btnTxt = el(btn, "", "CONTINUER", { position: "relative" });
+const cursor = el(s5, "abs", `<svg width="34" height="44" viewBox="0 0 17 22"><path d="M1 1v17l4.5-4 3 7 3-1.4-3-6.8H15z" fill="#FBF6EE" stroke="#1C1A17" stroke-width="1.2" stroke-linejoin="round"/></svg>`, { left: 0, top: 0, filter: "none" });
+const ripple = el(s5, "abs", "", { width: "60px", height: "60px", borderRadius: "50%", border: "2px solid " + C.gold, left: 0, top: 0 });
+const toast = el(s5, "abs", `<div style="display:flex;align-items:center;gap:18px"><div id="tk" style="width:44px;height:44px;border-radius:50%;background:#C9A26A;display:grid;place-items:center;color:#142820;font:600 22px Jost">✓</div><div><div class="serifm" style="font-size:28px">Demande d’atelier envoyée</div><div class="sans" style="font-size:16px;opacity:.7;margin-top:4px">Confirmation sous 24 h ouvrées</div></div></div>`, { left: "1290px", top: "90px", background: C.ivl, color: C.ink, padding: "20px 28px", border: "1px solid rgba(201,162,106,.6)", boxShadow: "0 30px 60px -30px rgba(0,0,0,.6)" });
+const s5flood = el(s5, "abs", "", { width: "44px", height: "44px", borderRadius: "50%", left: "1318px", top: "110px", background: C.gold });
+
+/* S6 — la gamme */
+const s6 = el(stage, "L");
+const s6cam = el(s6, "L", "", { transformOrigin: "50% 60%" });
+const s6kick = el(s6cam, "abs sans", "LA GAMME  ·  RENDUS BLENDER", { left: 0, width: W + "px", textAlign: "center", top: "120px", fontSize: "18px", letterSpacing: ".5em", color: C.goldT, fontWeight: 500 });
+const s6line = el(s6cam, "abs", "", { top: "792px", height: "1px", background: C.gold, left: W / 2 + "px" });
+const PRODS = [
+  { src: A.prod["flacon-trois-quarts-gauche"], h: 560, x: 420, nom: "Parfum 50 ml", prix: "Atelier Signature · 149 €" },
+  { src: A.prod["bougie-trois-quarts-gauche"], h: 380, x: 790, nom: "Bougie parfumée", prix: "59 €" },
+  { src: A.prod["format-voyage-trois-quarts-gauche"], h: 560, x: 1130, nom: "Format voyage 10 ml", prix: "29 €" },
+  { src: A.prod["coffret-trois-quarts-gauche"], h: 420, x: 1500, nom: "Coffret cadeau", prix: "Sur demande" },
+];
+PRODS.forEach(p => {
+  p.box = el(s6cam, "abs", "", { left: p.x - 300 + "px", top: 800 - p.h + "px", width: "600px", height: p.h + "px" });
+  const m = "radial-gradient(ellipse 50% 70% at 50% 45%, #000 66%, transparent 100%)";
+  img(p.box, p.src, { width: p.h * .75 + "px", height: p.h + "px", margin: "0 auto", webkitMaskImage: m, maskImage: m });
+  p.nomEl = el(s6cam, "mask", `<span class="serifm">${p.nom}</span>`, { left: p.x - 200 + "px", width: "400px", textAlign: "center", top: "818px", fontSize: "36px", color: C.ink, height: "48px" });
+  p.prixEl = el(s6cam, "abs sans", p.prix, { left: p.x - 200 + "px", width: "400px", textAlign: "center", top: "870px", fontSize: "20px", letterSpacing: ".18em", color: C.goldT, fontWeight: 500 });
+});
+
+/* S7 — visite */
+const s7 = el(stage, "L");
+const s7cam = el(s7, "L", "", { transformOrigin: "50% 50%" });
+const s7kick = el(s7cam, "abs sans", "VISITE 360°  ·  BOULOGNE-BILLANCOURT", { left: 0, width: W + "px", textAlign: "center", top: "112px", fontSize: "18px", letterSpacing: ".5em", color: C.goldT, fontWeight: 500 });
+const s7title = el(s7cam, "mask", "<span class='ital'>Entrez dans la boutique</span>", { left: 0, width: W + "px", textAlign: "center", top: "150px", fontSize: "96px", color: C.green, height: "124px" });
+const ARCH = [["vitrine", "La vitrine"], ["ilot", "L’espace découverte"], ["interieur", "Le mur des familles"], ["atelier", "L’atelier olfactif"]];
+const arches = ARCH.map(([k, lab], i) => {
+  const x = 240 + i * 380;
+  const a = el(s7cam, "abs", "", { left: x + "px", top: "320px", width: "340px", height: "560px", borderRadius: "170px 170px 0 0", overflow: "hidden", border: "1px solid rgba(201,162,106,.7)" });
+  const ph = img(a, A.photo[k], { position: "absolute", left: "-120px", top: "0", width: "580px", height: "560px", objectFit: "cover" });
+  const c = el(s7cam, "abs sans", lab.toUpperCase(), { left: x + "px", width: "340px", textAlign: "center", top: "902px", fontSize: "15px", letterSpacing: ".3em", color: C.ink, fontWeight: 500 });
+  return { a, ph, c };
+});
+const s7circle = el(s7, "abs", "", { borderRadius: "50%", background: C.green, left: W / 2 + "px", top: H / 2 + "px", width: "0", height: "0" });
+
+/* S8 — signature */
+const s8 = el(stage, "L", "", { background: "radial-gradient(60% 60% at 50% 48%, #24423a 0%, #1F3A2E 50%, #142820 100%)" });
+const s8cam = el(s8, "L", "", { transformOrigin: "50% 50%" });
+const rings = [0, 1, 2].map(() => el(s8cam, "abs", "", { borderRadius: "50%", border: "2px solid " + C.gold, left: 0, top: 0 }));
+const s8dot = el(s8cam, "abs", "", { background: C.gold, borderRadius: "13px", left: 0, top: 0 });
+const wm = A.wordmark, WMW = 780, WMH = WMW * wm.hauteur / wm.largeur, WMX = (W - WMW) / 2, WMY = 300;
+const vb = `-4 -4 ${wm.largeur + 8} ${wm.hauteur + 8}`;
+const wmM = el(s8cam, "abs", `<svg width="${WMW}" height="${WMH}" viewBox="${vb}"><path fill="#F6EDDD" d="${wm.maison}"/></svg>`, { left: WMX + "px", top: WMY + "px" });
+const wmSmask = el(s8cam, "abs", "", { left: WMX + "px", top: WMY + "px", width: WMW + "px", height: WMH + "px", overflow: "hidden" });
+const wmS = el(wmSmask, "abs", `<svg width="${WMW}" height="${WMH}" viewBox="${vb}"><path fill="#F6EDDD" d="${wm.sensa}"/></svg>`, { left: 0, top: 0 });
+const s8tag = el(s8cam, "mask", "<span class='ital'>Votre identité, votre signature olfactive.</span>", { left: 0, width: W + "px", textAlign: "center", top: WMY + WMH + 70 + "px", fontSize: "52px", color: "rgba(246,237,221,.88)", height: "70px" });
+const s8url = el(s8cam, "abs sans", "", { left: 0, width: W + "px", textAlign: "center", top: WMY + WMH + 176 + "px", fontSize: "22px", letterSpacing: ".42em", color: C.gold, fontWeight: 500 });
+const URL_TXT = "MAISON-SENSA.NETLIFY.APP";
+
+/* Texture : vignette + grain, puis HUD */
+const vig = el(stage, "L", "", { background: "radial-gradient(75% 75% at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,.28) 100%)", pointerEvents: "none" });
+const grain = document.createElement("canvas"); grain.width = W; grain.height = H; Object.assign(grain.style, { position: "absolute", left: 0, top: 0, mixBlendMode: "soft-light", opacity: .55, pointerEvents: "none" }); stage.appendChild(grain);
+const gctx = grain.getContext("2d");
+const tiles = [0, 1, 2, 3].map(k => { const c = document.createElement("canvas"); c.width = c.height = 256; const x = c.getContext("2d"), d = x.createImageData(256, 256), r = rng(100 + k); for (let i = 0; i < d.data.length; i += 4) { const v = 110 + r() * 60; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c; });
+const hud = el(stage, "L", "", { pointerEvents: "none" });
+const HB = [0, 1, 2, 3].map(i => el(hud, "abs", "", { width: "34px", height: "34px", borderStyle: "solid", borderWidth: ["1.5px 0 0 1.5px", "1.5px 1.5px 0 0", "0 0 1.5px 1.5px", "0 1.5px 1.5px 0"][i], left: [44, W - 78, 44, W - 78][i] + "px", top: [44, 44, H - 78, H - 78][i] + "px" }));
+const hTL = el(hud, "abs sans", "MAISON SENSA  —  SHOWREEL", { left: "94px", top: "50px", fontSize: "14px", letterSpacing: ".32em", fontWeight: 500 });
+const hTR = el(hud, "abs sans", "", { right: "94px", top: "50px", fontSize: "14px", letterSpacing: ".32em", fontWeight: 500, fontVariantNumeric: "tabular-nums" });
+const hBL = el(hud, "abs sans", "", { left: "94px", bottom: "50px", fontSize: "14px", letterSpacing: ".32em", fontWeight: 500 });
+const hBR = el(hud, "abs sans", "", { right: "94px", bottom: "50px", fontSize: "14px", letterSpacing: ".2em", fontWeight: 500, fontVariantNumeric: "tabular-nums" });
+const SC = [
+  [T.s1, "OUVERTURE", 1], [T.s2, "IDENTITÉ", 0], [T.s3, "TYPOGRAPHIE CINÉTIQUE", 1], [T.s4, "FAMILLES OLFACTIVES  ·  3D", 0],
+  [T.s5, "PRODUIT  ·  RÉSERVATION", 1], [T.s6, "LA GAMME", 0], [T.s7, "VISITE 360°", 0], [T.s8, "SIGNATURE", 1],
+];
+
+/* ---------- seek ---------- */
+function typed(s, t, t0, per) { return s.slice(0, Math.max(0, Math.floor((t - t0) / per))); }
+function revealLetters(Lt, t, t0, step, w = 18, z = .72, dir = 1) { Lt.L.forEach((s, i) => { const k = spring(t - t0 - i * step, w, z); tr(s, `translateY(${(1 - k) * 105 * dir}%)`); }); }
+
+function seek(tIn) {
+  const t = ((tIn % DUR) + DUR) % DUR;
+  [s1, s2, s3, s4, s5, s6, s7, s8].forEach(s => vis(s, false));
+  fctx.clearRect(0, 0, W, H);
+  let dark = 1, sceneIdx = 0;
+  for (let i = 0; i < SC.length; i++) if (t >= SC[i][0]) { sceneIdx = i; dark = SC[i][2]; }
+
+  /* S1 */
+  if (t < T.s2) {
+    vis(s1, true); stage.style.background = C.night;
+    op(s1grid, .2 + .8 * eOut(seg(t, 0, 1.2)));
+    tr(s1grid, `scale(${lerp(1.08, 1, eOut(seg(t, 0, 3.75)))})`);
+    const sp = spring(t - B, 16, .5), pulse = t < 4 * B ? 1 + .35 * Math.max(0, Math.sin((t - B) / B * Math.PI * 2)) : 1;
+    tr(s1spark, `scale(${sp * pulse})`); op(s1spark, t < 4 * B ? 1 : 1 - seg(t, 4 * B, 4 * B + .12));
+    const lw = track(0, [[4 * B, 1500, 11, .7]])(t);
+    const flood = eIn(seg(t, 7 * B, 8 * B));
+    const wob = t > 6 * B ? 9 * Math.sin(34 * (t - 6 * B)) * Math.exp(-7 * (t - 6 * B)) : 0;
+    const w = lerp(lw, W + 20, flood), h = lerp(2, H + 20, flood);
+    Object.assign(s1line.style, { width: w + "px", height: h + "px", left: (W - w) / 2 + "px", top: (H - h) / 2 + wob * (1 - flood) + "px", background: mix(C.gold, C.ivory, flood), display: t > 4 * B ? "" : "none" });
+    s1lab.textContent = typed(S1LAB, t, 4 * B + .1, .028); op(s1lab, 1 - seg(t, 6.6 * B, 7 * B));
+  }
+
+  /* S2 */
+  if (t >= T.s2 && t < T.s3) {
+    vis(s2, true); stage.style.background = C.ivory;
+    const u = t - T.s2;
+    tr(s2cam, `scale(${lerp(1.07, 1, eOut(seg(u, 0, 3)))})`);
+    s2kick.textContent = typed(S2KICK, u, .12, .02);
+    const rw = 520 * eOut(seg(u, .3, 1)); Object.assign(s2rule.style, { width: rw + "px", left: W / 2 - rw / 2 + "px" });
+    revealLetters(s2maison, u, .25, B / 4, 20, .75);
+    revealLetters(s2sensa, u, B, B / 4, 16, .62);
+    tr(s2tag.firstChild, `translateY(${(1 - spring(u - 3 * B, 14, .8)) * 110}%)`);
+    const out = eIn(seg(u, 6 * B, 7 * B));
+    op(s2cam, 1 - out); s2cam.style.transform += ` translateY(${-50 * out}px)`;
+    // le point : après la dernière lettre de SENSA
+    const lastL = s2sensa.L[4].parentNode, box = s2sensa.box;
+    const x0 = box.offsetLeft + lastL.offsetLeft + lastL.offsetWidth + 6, y0 = box.offsetTop + lastL.offsetTop + lastL.offsetHeight * .74;
+    const camK = lerp(1.07, 1, eOut(seg(u, 0, 3)));
+    const sx = W / 2 + (x0 - W / 2) * camK, sy = H / 2 + (y0 - H / 2) * camK;
+    const app = spring(u - 2.25 * B, 18, .5), mv = ease(seg(u, 6 * B, 7 * B)), grow = eIn(seg(u, 7 * B, 8 * B));
+    const dx = lerp(sx, W / 2, mv), dy = lerp(sy, H / 2, mv), sc = app * (1 + grow * 82);
+    Object.assign(s2dot.style, { left: dx - 15 + "px", top: dy - 15 + "px", background: mix(C.gold, C.green, seg(u, 7.2 * B, 8 * B)) });
+    tr(s2dot, `scale(${sc})`);
+  }
+
+  /* S3 */
+  if (t >= T.s3 && t < T.s4) {
+    vis(s3, true);
+    const u = t - T.s3, k = Math.min(3, Math.floor(u / (2 * B))), v = u - k * 2 * B;
+    [w1, w2, w3, w4].forEach((w, i) => vis(w, i === k));
+    if (k === 0) {
+      stage.style.background = C.green;
+      w1rows.forEach((r, i) => tr(r, `translateX(${(i % 2 ? -1 : 1) * (u * 160) - 420 - (i % 2) * 300}px)`));
+      const s = spring(v, 20, .6); tr(w1word, `translateX(${(1 - s) * -700}px) skewX(${(1 - s) * -14}deg)`);
+      tr(w1cap, `translateY(${(1 - spring(v - B / 2, 16, .8)) * 40}px)`); op(w1cap, seg(v, B / 2, B / 2 + .15));
+    } else if (k === 1) {
+      stage.style.background = C.gold;
+      const s = spring(v, 18, .6); tr(w2word, `translateY(${(1 - s) * 260}px) scale(${lerp(1.3, 1, s)})`);
+      tr(w2cap, `translateY(${(1 - spring(v - B / 2, 16, .8)) * 40}px)`); op(w2cap, seg(v, B / 2, B / 2 + .15));
+    } else if (k === 2) {
+      stage.style.background = C.night;
+      tr(w3photo, `scale(${lerp(1.18, 1.04, eOut(seg(v, 0, 2 * B)))})`);
+      const s = spring(v, 16, .7); tr(w3word, `scale(${lerp(2.4, 1, s)})`); op(w3word, seg(v, 0, .08));
+      const g = lerp(220, 0, spring(v - .05, 14, .7)), bx = 300 - g, by = 330 - g * .6, bw = W - 2 * bx, bh = 420 + g * 1.2;
+      const pos = [[bx, by], [bx + bw - 64, by], [bx, by + bh - 64], [bx + bw - 64, by + bh - 64]];
+      w3br.forEach((e, i) => Object.assign(e.style, { left: pos[i][0] + "px", top: pos[i][1] + "px" }));
+      Object.assign(w3lab.style, { left: bx + "px", top: by - 34 + "px" }); Object.assign(w3lab2.style, { left: bx + bw - 210 + "px", top: by + bh + 14 + "px" });
+      op(w3lab, Math.floor(v * 4) % 2 ? .55 : 1);
+    } else {
+      stage.style.background = C.ivory;
+      const p = eOut(seg(v, 0, 1.25 * B)); w4word.style.clipPath = `inset(0 ${(1 - p) * 100}% 0 0)`;
+      // largeur réelle du mot
+      const ww = 1040, wl = (W - ww) / 2;
+      Object.assign(w4pen.style, { left: wl + ww * p - 9 + "px", top: "560px" }); op(w4pen, p < 1 ? 1 : 1 - seg(v, 1.25 * B, 1.4 * B));
+      op(w4kick, seg(v, 0, .2));
+      const ul = eOut(seg(v, 1.2 * B, 1.55 * B)), fl = eIn(seg(v, 1.5 * B, 2 * B));
+      const r0 = { x: wl, y: 690, w: ww * ul, h: 6 };
+      Object.assign(w4bar.style, { left: lerp(r0.x, 0, fl) + "px", top: lerp(r0.y, 0, fl) + "px", width: lerp(r0.w, W, fl) + "px", height: lerp(r0.h, H, fl) + "px", background: mix(C.gold, FAM[0].amb[0], fl) });
+    }
+  }
+
+  /* S4 */
+  if (t >= T.s4 && t < T.s5) {
+    vis(s4, true);
+    const u = t - T.s4, k = Math.min(3, Math.floor(u / FAMDUR)), v = u - k * FAMDUR, f = FAM[k];
+    const pf = FAM[Math.max(0, k - 1)];
+    stage.style.background = f.amb[0];
+    s4prev.style.background = `linear-gradient(${pf.amb[0]}, ${pf.amb[1]})`;
+    s4cur.style.background = `linear-gradient(${f.amb[0]}, ${f.amb[1]})`;
+    const R = k === 0 ? 2000 : 1400 * eOut(seg(v, 0, .6));
+    s4cur.style.clipPath = `circle(${R}px at 960px 560px)`;
+    // caméra : à-coup à chaque famille
+    const kick = 1 + .05 * (1 - spring(v, 12, .7));
+    tr(s4cam, `scale(${kick})`);
+    // flacon 360° : un tour par famille puis pose de face
+    const ent = spring(u, 10, .72);
+    const ang = 360 * eOut(seg(v, 0, 1.0));
+    const fi = Math.round(ang / 10) % 36;
+    s4frames.forEach((e, i) => vis(e, i === fi));
+    tr(s4bottleBox, `translateY(${(1 - ent) * 400 + 8 * Math.sin(u * 2.2)}px) scale(${lerp(.7, 1, ent)})`);
+    // textes
+    s4kick.textContent = `FAMILLE 0${k + 1} / 04`; s4kick.style.color = f.encre; op(s4kick, .75);
+    s4names.forEach((n, i) => vis(n.box, i === k));
+    const out = seg(v, FAMDUR - .22, FAMDUR - .02);
+    s4names[k].L.forEach((s, i) => { const kk = spring(v - .04 - i * .055, 20, .7); tr(s, `translateY(${(1 - kk) * 105 - out * 110}%)`); });
+    s4evo.innerHTML = `<span class="ital" style="white-space:normal;display:block;color:${f.encre}">${f.evo}</span>`;
+    tr(s4evo.firstChild, `translateY(${(1 - spring(v - .3, 14, .85)) * 120 - out * 120}%)`);
+    s4notesLab.style.color = f.encre; op(s4notesLab, .6 * seg(v, .1, .3) * (1 - out));
+    s4notes.forEach((n, i) => { n.innerHTML = `<span class="sans" style="font-weight:300;color:${f.encre}"><span style="display:inline-block;width:28px;height:1px;background:#C9A26A;vertical-align:middle;margin-right:16px"></span>${f.notes[i]}</span>`; tr(n.firstChild, `translateY(${(1 - spring(v - .2 - i * B / 2, 16, .8)) * 110 - out * 110}%)`); });
+    // particules : anneau qui se condense puis éclate à chaque famille
+    fctx.fillStyle = f.jus;
+    for (const p of PARTS) {
+      let r;
+      if (v < .32) r = lerp(p.r * 1.12, 300 + p.d * 30, ease(v / .32));
+      else if (v < .85) r = lerp(300 + p.d * 30, p.r * 1.12, eOut((v - .32) / .53));
+      else r = p.r * 1.12 + (v - .85) * 24;
+      const a = p.a + p.sp * t + 1.4 * eOut(seg(v, .32, .85)) * Math.sign(p.sp);
+      const x = 960 + Math.cos(a) * r, y = 560 + Math.sin(a) * r * .42;
+      fctx.globalAlpha = p.al * (k === 0 ? seg(u, 0, .5) : 1);
+      fctx.beginPath(); fctx.arc(x, y, p.s, 0, 7); fctx.fill();
+    }
+    fctx.globalAlpha = 1;
+    // balayage vert vers la scène produit
+    const wp = eIn(seg(t, T.s5 - B, T.s5));
+    Object.assign(s4wipe.style, { left: W - wp * (W + 8) + "px", width: wp * (W + 8) + "px", display: wp > 0 ? "" : "none" });
+  }
+
+  /* S5 */
+  if (t >= T.s5 && t < T.s6) {
+    vis(s5, true); stage.style.background = C.green;
+    const u = t - T.s5;
+    op(s5kick, seg(u, .15, .35));
+    tr(s5t1.firstChild, `translateY(${(1 - spring(u - .2, 14, .8)) * 110}%)`);
+    tr(s5t2.firstChild, `translateY(${(1 - spring(u - .2 - B / 2, 14, .8)) * 110}%)`);
+    op(s5sub, seg(u, B * 1.5, B * 1.5 + .3));
+    const ce = spring(u, 11, .72);
+    tr(s5rig, `translateY(${(1 - ce) * 760}px) rotateX(${lerp(34, 7, ce) + 1.5 * Math.sin(u * 1.3)}deg) rotateY(${-16 + 3 * Math.sin(u * .9)}deg) rotateZ(${lerp(-6, 0, ce)}deg)`);
+    // curseur : jour → créneau → bouton
+    const cx = kf([[.6, 1880], [1.9 * B + .25, 1182, ease], [4 * B, 1182], [4 * B + .55, 1248, ease], [6 * B, 1248], [6 * B + .45, 1340, ease], [7 * B, 1340], [8 * B, 1900, ease]])(u);
+    const cy = kf([[.6, 1000], [1.9 * B + .25, 432, ease], [4 * B, 432], [4 * B + .55, 610, ease], [6 * B, 610], [6 * B + .45, 760, ease], [7 * B, 760], [8 * B, 1020, ease]])(u);
+    const clicks = [2 * B + .1, 4 * B + .6, 6 * B + .5];
+    let press = 1, rip = -1;
+    clicks.forEach(c => { if (u >= c && u < c + .12) press = .82; if (u >= c && u < c + .45) rip = u - c; });
+    Object.assign(cursor.style, { left: cx + "px", top: cy + "px" }); tr(cursor, `scale(${press})`);
+    if (rip >= 0) { const r = eOut(rip / .45); Object.assign(ripple.style, { display: "", left: cx - 30 + "px", top: cy - 30 + "px" }); tr(ripple, `scale(${.3 + r * 1.4})`); op(ripple, 1 - r); } else vis(ripple, false);
+    const dSel = u >= clicks[0], sSel = u >= clicks[1];
+    dayEls.forEach((d, i) => { const on = dSel && i === 1; d.style.background = on ? C.green : "transparent"; d.style.color = on ? C.ivl : (DAYS[i][2] ? C.ink : "rgba(28,26,23,.25)"); });
+    slotEls.forEach((s, i) => { const on = sSel && i === 2; s.style.background = on ? C.green : "transparent"; s.style.color = on ? C.ivl : (SLOTS[i][1] ? C.ink : "rgba(28,26,23,.3)"); });
+    const prog = seg(u, 6 * B + .62, 8 * B + .1);
+    const done = u >= 8 * B + .12;
+    btnFill.style.width = (done ? 0 : prog * 100) + "%";
+    btnTxt.textContent = done ? "DEMANDE ENVOYÉE  ✓" : prog > 0 ? `ENVOI…  ${Math.round(eOut(prog) * 100)} %` : "CONTINUER";
+    btn.style.background = done ? C.deep : C.green;
+    tr(btn, `scale(${u >= clicks[2] && u < clicks[2] + .14 ? .97 : 1})`);
+    const ts = spring(u - (8 * B + .3), 15, .72);
+    tr(toast, `translateX(${(1 - ts) * 700}px)`); op(toast, u > 8 * B + .3 ? 1 : 0);
+    // pastille dorée qui envahit l'écran → ivoire
+    const fl = eIn(seg(u, 11 * B, 12 * B));
+    s5flood.style.left = 1318 + (1 - ts) * 700 + "px";
+    tr(s5flood, `scale(${1 + fl * 110})`); op(s5flood, u > 10.9 * B ? 1 : 0);
+    s5flood.style.background = mix(C.gold, C.ivory, seg(u, 11.3 * B, 12 * B));
+  }
+
+  /* S6 */
+  if (t >= T.s6 && t < T.s7) {
+    vis(s6, true); stage.style.background = C.ivory;
+    const u = t - T.s6;
+    tr(s6cam, `scale(${lerp(1, 1.05, ease(seg(u, 0, 4 * B)))})`);
+    op(s6kick, seg(u, 0, .2));
+    const lw = 1500 * eOut(seg(u, 0, .5)); Object.assign(s6line.style, { width: lw + "px", left: (W - lw) / 2 + "px" });
+    const exit = eIn(seg(u, 3.5 * B, 4 * B));
+    PRODS.forEach((p, i) => {
+      const d = i * .75 * B, s = spring(u - d, 17, .58);
+      tr(p.box, `translateY(${(1 - s) * -900 - exit * (700 + i * 120)}px) rotate(${(1 - s) * (i % 2 ? 8 : -8)}deg)`);
+      tr(p.nomEl.firstChild, `translateY(${(1 - spring(u - d - B / 2, 16, .8)) * 110}%)`);
+      op(p.prixEl, seg(u, d + B * .7, d + B * .7 + .15) * (1 - exit));
+      op(p.nomEl, 1 - exit);
+    });
+  }
+
+  /* S7 */
+  if (t >= T.s7 && t < T.s8) {
+    vis(s7, true); stage.style.background = C.ivory;
+    const u = t - T.s7;
+    op(s7kick, seg(u, .05, .25));
+    tr(s7title.firstChild, `translateY(${(1 - spring(u - B / 2, 14, .8)) * 110}%)`);
+    arches.forEach((a, i) => {
+      const s = spring(u - i * B / 2, 14, .7);
+      tr(a.a, `translateY(${(1 - s) * 800}px)`);
+      tr(a.ph, `translateX(${lerp(-40, 80, u / 1.875)}px) scale(1.06)`);
+      op(a.c, seg(u, i * B / 2 + .3, i * B / 2 + .5));
+    });
+    const col = eIn(seg(u, 3 * B, 4 * B));
+    tr(s7cam, `scale(${lerp(1, .02, col)})`); op(s7cam, 1 - seg(u, 3.7 * B, 4 * B));
+    const cr = 1400 * eIn(seg(u, 3.2 * B, 4 * B));
+    Object.assign(s7circle.style, { width: 2 * cr + "px", height: 2 * cr + "px", left: W / 2 - cr + "px", top: H / 2 - cr + "px" });
+  }
+
+  /* S8 */
+  if (t >= T.s8) {
+    vis(s8, true); stage.style.background = C.green;
+    const u = t - T.s8;
+    tr(s8cam, `scale(${lerp(1, 1.035, ease(seg(u, 0, 3.75)))})`);
+    rings.forEach((r, i) => { const p = seg(u - i * .18, 0, 1.2), rr = 20 + eOut(p) * 520; Object.assign(r.style, { width: 2 * rr + "px", height: 2 * rr + "px", left: W / 2 - rr + "px", top: H / 2 - rr + "px" }); op(r, (1 - p) * (p > 0 ? .8 : 0)); });
+    // le point doré devient le filet sous le wordmark
+    const st = eOut(seg(u, B, 2.2 * B)), up = ease(seg(u, .2, B * 1.2));
+    const dw = lerp(26, 460, st), dh = lerp(26, 2, st), dy = lerp(H / 2, WMY + WMH + 36, up);
+    Object.assign(s8dot.style, { width: dw + "px", height: dh + "px", left: W / 2 - dw / 2 + "px", top: dy - dh / 2 + "px", borderRadius: lerp(13, 0, st) + "px" });
+    tr(s8dot, `scale(${spring(u, 18, .5)})`);
+    op(wmM, seg(u, 1.5 * B, 2.2 * B)); tr(wmM, `translateY(${(1 - spring(u - 1.5 * B, 12, .85)) * 30}px)`);
+    tr(wmS, `translateY(${(1 - spring(u - 1.9 * B, 13, .8)) * 100}%)`);
+    tr(s8tag.firstChild, `translateY(${(1 - spring(u - 2.6 * B, 13, .85)) * 110}%)`);
+    const tx = typed(URL_TXT, u, 3.2 * B, B / 8);
+    s8url.textContent = tx + (Math.floor(u / (B / 2)) % 2 ? "▍" : " ");
+  }
+
+  /* grain + vignette + HUD */
+  gctx.clearRect(0, 0, W, H);
+  const tile = tiles[Math.floor(t * 24) % 4];
+  for (let y = 0; y < H; y += 256) for (let x = 0; x < W; x += 256) gctx.drawImage(tile, x, y);
+  op(vig, dark ? 1 : .55);
+  const hc = dark ? "rgba(246,237,221,.6)" : "rgba(28,26,23,.5)";
+  hud.style.color = hc; HB.forEach(b => b.style.borderColor = hc);
+  hTR.textContent = `SCÈNE 0${sceneIdx + 1} / 08`;
+  hBL.textContent = SC[sceneIdx][1];
+  const fr = Math.floor((t % 1) * 30), ss = Math.floor(t);
+  hBR.innerHTML = `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#E5483B;margin-right:12px;opacity:${Math.floor(t * 2) % 2 ? .35 : 1}"></span>00:${String(ss).padStart(2, "0")}:${String(fr).padStart(2, "0")}`;
+}
+window.seek = seek;
+
+/* ---------- bande-son (synthèse) ---------- */
+window.buildAudio = async function (ctx) {
+  const sr = ctx.sampleRate, out = ctx.createDynamicsCompressor();
+  out.threshold.value = -14; out.ratio.value = 3; out.attack.value = .005; out.release.value = .2;
+  const master = ctx.createGain(); master.gain.value = .8; out.connect(master); master.connect(ctx.destination);
+  const music = ctx.createGain(); music.gain.value = .55; music.connect(out);
+  const fxb = ctx.createGain(); fxb.gain.value = .8; fxb.connect(out);
+  const R = rng(42), nb = ctx.createBuffer(1, sr * 2, sr), nd = nb.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = R() * 2 - 1;
+  const noise = (t0, dur, type, f0, f1, g0, dest, q = 1) => {
+    const s = ctx.createBufferSource(); s.buffer = nb; const f = ctx.createBiquadFilter(); f.type = type; f.Q.value = q;
+    f.frequency.setValueAtTime(f0, t0); f.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(g0, t0 + Math.min(.01, dur / 4)); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    s.connect(f); f.connect(g); g.connect(dest); s.start(t0, R()); s.stop(t0 + dur + .05);
+  };
+  const tone = (t0, dur, f0, f1, g0, type, dest, att = .005) => {
+    const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f0, t0); if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(g0, t0 + att); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(dest); o.start(t0); o.stop(t0 + dur + .05);
+  };
+  const kick = (t0, g = 1) => { tone(t0, .42, 150, 42, .95 * g, "sine", music, .002); noise(t0, .03, "highpass", 3000, 2000, .15 * g, music); };
+  const clap = t0 => { for (const d of [0, .012, .024]) noise(t0 + d, .16, "bandpass", 1600, 1200, .35, music, 1.2); };
+  const hat = (t0, g = .12) => noise(t0, .05, "highpass", 8000, 9000, g, music);
+  const impact = t0 => { tone(t0, 1.1, 70, 28, .9, "sine", fxb, .003); noise(t0, .7, "lowpass", 3000, 200, .5, fxb); };
+  const whoosh = (t0, d = .45) => noise(t0, d, "bandpass", 400, 4000, .22, fxb, 2.5);
+  const riser = (t0, d) => { const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; const f = ctx.createBiquadFilter(); f.type = "bandpass"; f.Q.value = 3; f.frequency.setValueAtTime(300, t0); f.frequency.exponentialRampToValueAtTime(7000, t0 + d); const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(.3, t0 + d); g.gain.linearRampToValueAtTime(0, t0 + d + .02); s.connect(f); f.connect(g); g.connect(fxb); s.start(t0); s.stop(t0 + d + .05); };
+  const blip = (t0, f = 880, g = .18) => { tone(t0, .14, f, f, g, "sine", fxb); tone(t0, .1, f * 2, f * 2, g * .3, "triangle", fxb); };
+  const bell = (t0, g = .3) => { for (const [m, a, d] of [[1, 1, 3.2], [2.01, .45, 2.2], [3.02, .25, 1.4], [4.1, .12, .9]]) tone(t0, d, 523.25 * m, 523.25 * m, g * a, "sine", fxb, .004); };
+  const click = t0 => noise(t0, .03, "bandpass", 3500, 3000, .35, fxb, 4);
+
+  // harmonie : Ré m — Si♭ — Fa — Do (une mesure chacun)
+  const roots = [73.42, 58.27, 87.31, 65.41];
+  const chords = [[146.8, 174.6, 220], [116.5, 146.8, 174.6], [174.6, 220, 261.6], [130.8, 164.8, 196]];
+  for (let bar = 0; bar < 16; bar++) {
+    const t0 = bar * BAR, c = chords[bar % 4];
+    // nappe
+    for (const f of c) { tone(t0, BAR + .3, f, f, .05, "triangle", music, .35); tone(t0, BAR + .3, f * 1.004, f * 1.004, .03, "sawtooth", music, .4); }
+    // basse en croches à partir de la mesure 3
+    if (bar >= 2 && bar < 14) for (let e = 0; e < 8; e++) if (e % 2 === 0 || e === 3 || e === 7) tone(t0 + e * B / 2, B / 2 * .9, roots[bar % 4], roots[bar % 4], .32, "sawtooth", (() => { const f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 320; f.connect(music); return f; })(), .005);
+  }
+  // pulsation d'intro
+  for (let b = 1; b < 8; b += 2) tone(b * B, .3, 60, 40, .35, "sine", music);
+  // groove principal (mesures 3 à 14)
+  for (let b = 8; b < 56; b++) {
+    const t0 = b * B;
+    kick(t0, b % 4 === 0 ? 1 : .85);
+    if (b % 2 === 1) clap(t0);
+    hat(t0 + B / 2); if (b >= 24) hat(t0 + B / 4, .05), hat(t0 + 3 * B / 4, .05);
+  }
+  kick(56 * B, 1.1);
+  // événements
+  riser(4 * B, 4 * B); [8, 16, 24, 36, 48].forEach(b => impact(b * B)); impact(56 * B);
+  [6 * B, 14.6 * B, 23.4 * B, 27 * B - .2, 30 * B - .2, 33 * B - .2, 35 * B, 47.4 * B, 51.6 * B].forEach(t => whoosh(t));
+  for (let i = 0; i < 5; i++) tone(9 * B + i * B / 4, .08, 1760, 1760, .07, "sine", fxb);
+  blip(11 * B, 660); [16, 18, 20, 22].forEach((b, i) => blip(b * B, [880, 988, 1175, 1318][i]));
+  [2 * B + .1, 4 * B + .6, 6 * B + .5].forEach(c => click(T.s5 + c));
+  for (let i = 0; i < 6; i++) tone(T.s5 + 6 * B + .62 + i * .12, .06, 1200 + i * 120, 1200 + i * 120, .05, "sine", fxb);
+  bell(T.s5 + 8 * B + .12, .22);
+  [48, 48.75, 49.5, 50.25].forEach(b => { tone(b * B, .35, 110, 50, .7, "sine", fxb, .002); noise(b * B, .08, "lowpass", 2000, 400, .3, fxb); });
+  riser(T.s7 + 2.6 * B, 1.4 * B);
+  bell(T.s8, .35); bell(T.s8 + 2 * B, .12);
+  for (let i = 0; i < URL_TXT.length; i++) tone(T.s8 + 3.2 * B + i * B / 8, .03, 2400, 2400, .03, "square", fxb);
+  for (const f of [146.8, 220, 293.7]) tone(T.s8, 3.6, f, f, .06, "triangle", music, .8);
+};
+
+/* ---------- aperçu interactif (sans ?render) ---------- */
+if (!RENDER) {
+  const fit = () => { const k = Math.min(innerWidth / W, (innerHeight - 50) / H); stage.style.transform = `scale(${k})`; };
+  addEventListener("resize", fit); fit();
+  const bar = el(document.body, "", "", {}); bar.id = "controls";
+  const pb = document.createElement("button"); pb.textContent = "▶ Lecture"; bar.appendChild(pb);
+  const rg = document.createElement("input"); rg.type = "range"; rg.min = 0; rg.max = DUR; rg.step = .01; rg.value = 0; bar.appendChild(rg);
+  const lab = el(bar, "", "0.00 s");
+  let buf, ac, src, startAt = 0, offset = 0, playing = false;
+  async function play() { ac ??= new AudioContext(); if (!buf) { const off = new OfflineAudioContext(2, Math.ceil(48000 * DUR), 48000); await buildAudio(off); buf = await off.startRendering(); } src = ac.createBufferSource(); src.buffer = buf; src.connect(ac.destination); src.start(0, offset % DUR); startAt = ac.currentTime; playing = true; pb.textContent = "❚❚ Pause"; }
+  function pause() { if (!playing) return; offset += ac.currentTime - startAt; src.stop(); playing = false; pb.textContent = "▶ Lecture"; }
+  const now = () => playing ? (offset + ac.currentTime - startAt) % DUR : offset;
+  pb.onclick = () => playing ? pause() : play();
+  rg.oninput = () => { const p = playing; pause(); offset = +rg.value; if (p) play(); };
+  (function loop() { const t = now(); seek(t); rg.value = t; lab.textContent = t.toFixed(2) + " s"; requestAnimationFrame(loop); })();
+} else seek(0);
+</script>
+</body>
+</html>
