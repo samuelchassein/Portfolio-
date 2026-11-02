@@ -39,6 +39,17 @@ export function EnTete() {
         defile ? "bg-ivoire/88 shadow-[0_1px_0_rgb(28_26_23/0.08)] backdrop-blur-md" : "bg-ivoire/88 backdrop-blur-md md:bg-transparent md:backdrop-blur-none"
       }`}
     >
+      {/*
+        Haut de page (desktop) : l'en-tête reste ouvert sur l'image, mais un voile ivoire dégradé
+        derrière la navigation garde les liens lisibles sur n'importe quelle photo. Il s'efface
+        en fondu quand le fond translucide prend le relais au défilement.
+      */}
+      <span
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[170%] bg-[linear-gradient(to_bottom,rgb(246_237_221/0.94),rgb(246_237_221/0.78)_50%,rgb(246_237_221/0))] transition-opacity duration-500 ease-sortie md:block ${
+          defile ? "opacity-0" : "opacity-100"
+        }`}
+      />
       <a
         href="#contenu"
         className="sr-only z-[60] bg-vert px-4 py-3 text-ivoire-clair focus:not-sr-only focus:absolute focus:left-4 focus:top-3"
